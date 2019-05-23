@@ -25,15 +25,21 @@ public class Playing extends GameState{
 	Main game;
 
 	ArrayList<Beat>[] beats = new ArrayList[3];
-	Rectangle endLine = new Rectangle(400, 3, Color.web("white"));
-	Rectangle endLine2 = new Rectangle(400, 3, Color.web("white"));
-	Rectangle background, lanes;
+	
+	Rectangle background, lanes, backMult, backAcc, complete, total;
 	
 	LinearGradient grad1, grad2, gradGoal;
 	int score = 0;
 	int height, width;
 	int streak = 0;
 	int mult = 1;
+	
+	double accuracy = 1;
+	int missed = 0;
+	int hits;
+	
+	double currPos = 0;
+	int numBeats = 0;
 	
 	long gameStart;
 	boolean started = false;
@@ -47,25 +53,26 @@ public class Playing extends GameState{
 	
 	public Playing(Main g) {
 		
+		
+		
 		game = g;
 		
 		for(int i=0;i<3;i++) {
 			beats[i] = new ArrayList<Beat>();
 		}
 		
-		scoreText = new Text(150, 45, "Score: " + score);
-		scoreText.setFont(Font.font("Roberto", FontWeight.BOLD, 30));
-		scoreText.setFill(Color.WHITE);
-		
-		
+		Print scoreText = new Print(50, 45, -1, Color.WHITE, "Score: " + score);
+		Print multText = new Print(25, 435, -1, Color.WHITE, "X1");
+		Print streakText = new Print(25, 465, -1, Color.WHITE, "" + streak);
+		Print accText = new Print(315, 450, -1, Color.WHITE, "100%");
+		toPrint.add(scoreText);
+		toPrint.add(multText);
+		toPrint.add(streakText);
+		toPrint.add(accText);
 		
 		height = game.getHeight();
 		width = game.getWidth();
 		
-		endLine.setX(0);
-		endLine.setY(height-50);
-		endLine2.setX(0);
-		endLine2.setY(height-150);
 	
 		grad1 = new LinearGradient(0f, 1f, 1f, 0f, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
@@ -108,6 +115,17 @@ public class Playing extends GameState{
 		lanes = new Rectangle(300, height, Color.web("#773272", 0.7));
 		lanes.setX(50);
 		
+		backMult = new Rectangle(100, 75, Color.web("#3e324c", 0.8));
+		backMult.setY(400);
+		
+		backAcc = new Rectangle(100, 75, Color.web("#3e324c", 0.8));
+		backAcc.setY(400);
+		backAcc.setX(width - 100);
+		
+		complete = new Rectangle(0, 10, gradGoal);
+		total = new Rectangle(width, 10, Color.web("#3e324c"));
+				
+		
 		conductor = new Conductor(1, height);
 		
 		
@@ -123,6 +141,8 @@ public class Playing extends GameState{
 	}
 	
 	public void update(int counter) {
+		
+		complete.setWidth(width * (conductor.songPosition()/conductor.songLength()));
 		
 		if(System.nanoTime() - gameStart > conductor.getDelay()*1000000000 && !started) {
 			conductor.play();
@@ -141,11 +161,20 @@ public class Playing extends GameState{
 		}
 		
 		genBeats();
+		accuracy = ((double)(hits) + 1)/((missed + hits) + 1);
 		
-		scoreText.setText("Score: " + score);
 		
-		if(streak > 16) {
+		toPrint.get(0).setText("Score: " + score);
+		toPrint.get(1).setText("X" + mult);
+		toPrint.get(2).setText("" + streak);
+		toPrint.get(3).setText(String.format("%.0f", accuracy*100)+ "%");
+	
+		if (streak > 31) {
+			mult = 8;
 			background.setFill(grad2);
+		} else if(streak > 15) {
+			mult = 4;
+		} else if(streak > 7) {
 			mult = 2;
 		} 
 		
@@ -158,10 +187,12 @@ public class Playing extends GameState{
 		group.getChildren().add(background);
 		group.getChildren().add(lanes);
 
-
 		for(Circle c : goals) {
 			group.getChildren().add(c);
 		}
+		
+		group.getChildren().add(total);
+		group.getChildren().add(complete);
 		
 		
 		
@@ -184,6 +215,9 @@ public class Playing extends GameState{
 				}
 			}
 		}
+
+		group.getChildren().add(backAcc);
+		group.getChildren().add(backMult);
 		
 		for(int i=0;i<toPrint.size();i++) {
 			Print curr = toPrint.get(i);
@@ -194,8 +228,6 @@ public class Playing extends GameState{
 			}
 		}
 		
-		scoreText.setTextAlignment(TextAlignment.CENTER);
-		group.getChildren().add(scoreText);
 		
 		
 		
@@ -231,6 +263,7 @@ public class Playing extends GameState{
 				beats[lane].remove(0);
 				score += 100*mult;
 				streak ++;
+				hits ++;
 				toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.PURPLE, "perfect!"));
 			} else {
 				miss();
@@ -240,14 +273,13 @@ public class Playing extends GameState{
 	}
 	
 	public void miss() {
+		missed ++;
 		score -= 100;
 		background.setFill(grad1);
 		streak = 0;
 		mult = 1;
+		
 	}
-	
-	double currPos = 0;
-	int numBeats = 0;
 	
 	public void genBeats() {
 				

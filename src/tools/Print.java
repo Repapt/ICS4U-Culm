@@ -26,7 +26,9 @@ public class Print {
 	public int update() {
 		count ++;
 		
-		if(count >= dur) {
+		if(dur == -1) {
+			return 1;
+		} else if(count >= dur) {
 			return -1;
 		}
 		return 1;
@@ -34,6 +36,10 @@ public class Print {
 	
 	public Text getText() {
 		return text;
+	}
+	
+	public void setText(String toSet) {
+		text.setText(toSet);
 	}
 	
 }

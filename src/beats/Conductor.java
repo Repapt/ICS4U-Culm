@@ -97,7 +97,7 @@ public class Conductor {
 		songTime += System.nanoTime()/1000000000.0 - prevFrame;
 		prevFrame = System.nanoTime()/1000000000.0;
 		
-		if(Math.abs(player.getCurrentTime().toSeconds() - songLength()) < 0.1) {
+		if(Math.abs(songPosition() - songLength()) < 0.01) {
 			return 1;
 			
 		} else if (player.getCurrentTime().toSeconds() != lastPos) {
