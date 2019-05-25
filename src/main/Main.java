@@ -24,6 +24,7 @@ public class Main extends Application{
 	int height = 600;
 	int width = 400;
 	public ArrayList<Beat> beats;
+	GameState game;
 	
 	UserInput input = new UserInput();
 
@@ -46,7 +47,7 @@ public class Main extends Application{
 		mainStage.setTitle("Weezer");
 		
 		
-		GameState game = new Playing(this);
+		game = new Menu(this);
 		
 		
 		Scene scene = new Scene(root, width, height, Color.BLACK);
@@ -78,6 +79,10 @@ public class Main extends Application{
 		mainStage.show();
 		
 		
+	}
+	
+	public void changeState(GameState state) {
+		game = state;
 	}
 	
 	public void end() throws Exception {

@@ -55,7 +55,7 @@ public class Beat {
 			circle.setCenterY(y);
 		}
 		
-		if(pauseCount > 6) {
+		if(pauseCount > 5) {
 			y += speed;
 			circle.setCenterY(y);
 		}

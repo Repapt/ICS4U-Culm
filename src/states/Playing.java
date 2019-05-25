@@ -1,7 +1,10 @@
 package states;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+
+import javax.sound.midi.InvalidMidiDataException;
 
 import beats.Beat;
 import beats.Conductor;
@@ -18,6 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import main.Main;
+import tools.LoadMidi;
 import tools.Print;
 
 public class Playing extends GameState{
@@ -107,9 +111,6 @@ public class Playing extends GameState{
 		goals[2] = new Circle(300 ,500,50, gradGoal);
 		
 		
-		
-		
-		
 		background = new Rectangle(width, height, grad1);
 		
 		lanes = new Rectangle(300, height, Color.web("#773272", 0.7));
@@ -125,14 +126,17 @@ public class Playing extends GameState{
 		complete = new Rectangle(0, 10, gradGoal);
 		total = new Rectangle(width, 10, Color.web("#3e324c"));
 				
-		
-		conductor = new Conductor(1, height);
+		try {
+			conductor = new Conductor(3, height);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		
 		
 		try {
 			startAnim();
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -257,14 +261,31 @@ public class Playing extends GameState{
 			miss();
 			toPrint.add(new Print(100*(lane+1), 440, 10, Color.RED, "miss"));
 		} else {
+			
 			Beat curr = beats[lane].get(0);
 			double y = curr.getY();
-			if(y > 475 && y < 575) {
+			
+			for(int i=0;i<len;i++) {
+				curr = beats[lane].get(i);
+				y = curr.getY();
+				if(!(curr.getY() > 575)) {
+					break;
+				}
+			}
+			if(y < 575 && y > 450) {
+				
+				if(y < 510 && y > 490) {
+					score += 100*mult;
+					toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.PURPLE, "perfect!"));
+
+				} else {
+					score += 50*mult;
+					toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.GREEN, "good!"));
+
+				}
 				beats[lane].remove(0);
-				score += 100*mult;
 				streak ++;
 				hits ++;
-				toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.PURPLE, "perfect!"));
 			} else {
 				miss();
 				toPrint.add(new Print(100*(lane+1), 440, 10, Color.RED, "miss"));
@@ -282,26 +303,50 @@ public class Playing extends GameState{
 	}
 	
 	public void genBeats() {
+		
+		if(LoadMidi.beats.size() == 0) {
+			
+		} else {
+			String next = LoadMidi.beats.get(0);
+			int space = next.indexOf(" ");
+			int time = Integer.parseInt(next.substring(0,space));
+			int key = Integer.parseInt(next.substring(space + 1));
+		
+			//System.out.println(time + " " + key);
+					
+			currPos = conductor.songPosition();
+			
+			if(currPos > time*conductor.getTickSize() - conductor.getDelay() - conductor.getTravelTime()) {
 				
-		currPos = conductor.songPosition();
-		
-		if(currPos > conductor.getBeatTime()) {
+				numBeats ++;
+				
+				//System.out.println(currPos - lastPos);
+				
+				int lane;
 			
-			numBeats ++;
-			
-			//System.out.println(currPos - lastPos);
-		
-			int lane = (int)(Math.random()*3);
-			beats[lane].add(new Beat(lane, conductor.getBeatSpeed()));
-
-			conductor.addBeat();
-			
-			
+				if(key == 60) {
+					lane = 0;
+				} else if (key == 62) {
+					lane = 1;
+				} else if (key == 64){
+					lane = 2;
+				} else {
+					System.out.println("failure @" + time);
+					lane = 0;
+				}
+				beats[lane].add(new Beat(lane, conductor.getBeatSpeed()));
+	
+				conductor.addBeat();
+				
+				LoadMidi.beats.remove(0);
+				
+				
+			}
 		}
 	}
 	
 	
-	public void startAnim() throws InterruptedException {
+	public void startAnim() throws Exception {
 		long start = System.nanoTime();
 		TimeUnit.SECONDS.sleep(1);
 		long end = System.nanoTime();

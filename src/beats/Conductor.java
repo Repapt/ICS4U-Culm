@@ -1,28 +1,39 @@
 package beats;
 
+import java.io.IOException;
+
+import javax.sound.midi.InvalidMidiDataException;
+
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import tools.LoadMidi;
 
 public class Conductor {
 	
-	double[] bpm = new double[3];
-	double[] actualStart = new double[3];
+	int numSongs = 4;
+	
+	double[] bpm = new double[numSongs];
+	double[] actualStart = new double[numSongs];
 	double prevFrame, songTime = 0, lastPos = 0;
 	double increment;
 	
 	double beatSpeed, beatTime, travelTime;
 		
-	Media[] songs = new Media[3];
+	Media[] songs = new Media[numSongs];
 	
-	double[] delays = new double[3];
-	
+	double[] delays = new double[numSongs];
+
 	int songNum;
 	
 	double height;
 	
+	double tickSize;
+	
 	MediaPlayer player;
 	
-	public Conductor(int songNum, double height) {
+	public Conductor(int songNum, double height) throws Exception {
+
+		LoadMidi.load(songNum);
 		
 		this.songNum = songNum;
 		this.height = height;
@@ -34,17 +45,21 @@ public class Conductor {
 		
 		bpm[1] = 125;
 		bpm[2] = 95;
+		bpm[3] = 100;
+		
 		
 		songs[0] = new Media(getClass().getResource("Take On Me.mp3").toExternalForm());
 		songs[1] = new Media(getClass().getResource("01 What Makes You Beautiful.m4a").toExternalForm());
 		songs[2] = new Media(getClass().getResource("Closer.mp3").toExternalForm());
+		songs[3] = new Media(getClass().getResource("Happier.wav").toExternalForm());
 		
 		player = new MediaPlayer(songs[songNum]);
 		increment = 60/bpm[songNum];
 		
-
+		tickSize = LoadMidi.resolution * (bpm[songNum]/60);
+		tickSize = 1.0/tickSize;
 		
-		beatSpeed = (height - 50.0)*(bpm[songNum]/14400);
+		beatSpeed = (height - 50.0)*(bpm[songNum]/7200);
 		travelTime = (height-50.0)/(60*beatSpeed);
 		beatTime = actualStart[songNum] - travelTime;
 		
@@ -55,10 +70,19 @@ public class Conductor {
 		beatTime += increment;
 	}
 	
+	public double getTickSize() {
+		return tickSize;
+		
+	}
+	
 	
 	public void play() {
 		prevFrame = System.nanoTime()/1000000000.0;
 		player.play();
+	}
+	
+	public double getTravelTime() {
+		return travelTime;
 	}
 	
 	public double getDelay() {
