@@ -37,8 +37,6 @@ public class Conductor {
 		
 		this.songNum = songNum;
 		this.height = height;
-
-		delays[1] = 1.464;
 		
 		actualStart[1] =  0.456;
 		actualStart[2] = 10.722;

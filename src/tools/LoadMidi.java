@@ -17,7 +17,7 @@ public class LoadMidi {
     
     public static void load(int songNum) throws InvalidMidiDataException, IOException {
     	
-    	sequence = MidiSystem.getSequence(new File("easy" + songNum + ".mid"));
+    	sequence = MidiSystem.getSequence(LoadMidi.class.getResource("/tools/easy" + songNum + ".mid"));
     	
     	Track track = sequence.getTracks()[0];
     	

@@ -34,7 +34,6 @@ public class Playing extends GameState{
 	
 	LinearGradient grad1, grad2, gradGoal;
 	int score = 0;
-	int height, width;
 	int streak = 0;
 	int mult = 1;
 	
@@ -57,6 +56,7 @@ public class Playing extends GameState{
 	
 	public Playing(Main g) {
 		
+		super(g);
 		
 		
 		game = g;
@@ -74,10 +74,6 @@ public class Playing extends GameState{
 		toPrint.add(streakText);
 		toPrint.add(accText);
 		
-		height = game.getHeight();
-		width = game.getWidth();
-		
-	
 		grad1 = new LinearGradient(0f, 1f, 1f, 0f, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
 				            new Stop(0, Color.web("#64c2f8")),
@@ -155,12 +151,7 @@ public class Playing extends GameState{
 		
 		if(started) {
 			if(conductor.update() == 1) {
-				try {
-					game.end();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				game.changeState(new Menu(game));
 			}
 		}
 		
@@ -237,11 +228,11 @@ public class Playing extends GameState{
 		
 	}
 	
-	public void keyPress(KeyEvent event) {
+	public void keyRelease(KeyEvent event) {
 		
 	}
 	
-	public void keyRelease(KeyEvent event) {
+	public void keyPress(KeyEvent event) {
 		String key  = event.getCode().toString();
 		if(key.equals("A")) {
 			checkHit(0);
@@ -307,38 +298,54 @@ public class Playing extends GameState{
 		if(LoadMidi.beats.size() == 0) {
 			
 		} else {
+			
 			String next = LoadMidi.beats.get(0);
 			int space = next.indexOf(" ");
 			int time = Integer.parseInt(next.substring(0,space));
-			int key = Integer.parseInt(next.substring(space + 1));
-		
+
 			//System.out.println(time + " " + key);
 					
 			currPos = conductor.songPosition();
 			
-			if(currPos > time*conductor.getTickSize() - conductor.getDelay() - conductor.getTravelTime()) {
+			if(currPos > time*conductor.getTickSize() - conductor.getTravelTime()) {
 				
-				numBeats ++;
-				
-				//System.out.println(currPos - lastPos);
-				
-				int lane;
+				for(int i=0;i<LoadMidi.beats.size();i++) {
+					
+					String next2 = LoadMidi.beats.get(0);
+					int space2 = next2.indexOf(" ");
+					int time2 = Integer.parseInt(next2.substring(0,space2));
+					int key2 = Integer.parseInt(next2.substring(space2 + 1));
+					
+					if(time2 == time) {
+						
+						numBeats ++;
+						
+						//System.out.println(currPos - lastPos);
+						
+						int lane;
+					
+						if(key2 == 60) {
+							lane = 0;
+						} else if (key2 == 62) {
+							lane = 1;
+						} else if (key2 == 64){
+							lane = 2;
+						} else {
+							System.out.println("failure @" + time);
+							lane = 0;
+						}
+						beats[lane].add(new Beat(lane, conductor.getBeatSpeed()));
 			
-				if(key == 60) {
-					lane = 0;
-				} else if (key == 62) {
-					lane = 1;
-				} else if (key == 64){
-					lane = 2;
-				} else {
-					System.out.println("failure @" + time);
-					lane = 0;
+						conductor.addBeat();
+						
+						LoadMidi.beats.remove(0);
+						
+					} else {
+						break;
+					}
+					
 				}
-				beats[lane].add(new Beat(lane, conductor.getBeatSpeed()));
-	
-				conductor.addBeat();
 				
-				LoadMidi.beats.remove(0);
 				
 				
 			}

@@ -2,10 +2,17 @@ package states;
 
 import javafx.scene.Group;
 import javafx.scene.input.KeyEvent;
+import main.Main;
 
 public abstract class GameState {
 	
+	public double height;
+	public double width;
 	
+	public GameState(Main g) {
+		height = g.getHeight();
+		width = g.getWidth();
+	}
 	
 	
 	

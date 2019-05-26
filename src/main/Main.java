@@ -60,6 +60,14 @@ public class Main extends Application{
 			
 		}
 		);	
+		scene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>(){
+			
+			public void handle(KeyEvent event) {
+				game.keyPress(event);
+			}
+			
+		}
+		);	
 		
 		AnimationTimer timer = new AnimationTimer() {
 			int counter = 0;
