@@ -16,6 +16,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -30,9 +31,9 @@ public class Playing extends GameState{
 
 	ArrayList<Beat>[] beats = new ArrayList[3];
 	
-	Rectangle background, lanes, backMult, backAcc, complete, total;
+	Rectangle background, lanes, backMult, backAcc, complete, total, inLines;
 	
-	LinearGradient grad1, grad2, gradGoal;
+	LinearGradient grad1, grad2, gradGoal, gradGoal2, gradGoal22;
 	int score = 0;
 	int streak = 0;
 	int mult = 1;
@@ -100,6 +101,24 @@ public class Playing extends GameState{
 				            new Stop(1, Color.web("#ffe0fb")),
 				});
 		
+		gradGoal2 = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, 
+				new Stop[]{
+				           
+			            new Stop(0, Color.web("#fffde2")),
+			            new Stop(0.2, Color.web("#dbc627")),
+			            new Stop(0.4, Color.web("#d8c550")),
+			            new Stop(1, Color.web("#fffde0")),
+			});
+		
+		gradGoal22 = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, 
+				new Stop[]{
+				           
+			            new Stop(0, Color.web("#fffde2", 0.85)),
+			            new Stop(0.2, Color.web("#dbc627", 0.85)),
+			            new Stop(0.4, Color.web("#d8c550", 0.85)),
+			            new Stop(1, Color.web("#fffde0", 0.85)),
+			});
+		
 
 		
 		goals[0] = new Circle(100 ,500,50, gradGoal);
@@ -108,9 +127,6 @@ public class Playing extends GameState{
 		
 		
 		background = new Rectangle(width, height, grad1);
-		
-		lanes = new Rectangle(300, height, Color.web("#773272", 0.7));
-		lanes.setX(50);
 		
 		backMult = new Rectangle(100, 75, Color.web("#3e324c", 0.8));
 		backMult.setY(400);
@@ -121,9 +137,22 @@ public class Playing extends GameState{
 		
 		complete = new Rectangle(0, 10, gradGoal);
 		total = new Rectangle(width, 10, Color.web("#3e324c"));
+		
+		lanes = new Rectangle(300, height + 50, Color.web("#773272", 0.65));
+		lanes.setX(50);
+		lanes.setStroke(Color.web("#513a5b", 0.8));
+		lanes.setStrokeWidth(5);
+		lanes.setStrokeType(StrokeType.OUTSIDE);
+		
+		inLines = new Rectangle(100, 700, null);
+		inLines.setX(150);
+		inLines.setStroke(Color.web("#513a5b", 0.5));
+		inLines.setStrokeWidth(3);
+		
+		
 				
 		try {
-			conductor = new Conductor(3, height);
+			conductor = new Conductor(0, height);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -166,7 +195,7 @@ public class Playing extends GameState{
 	
 		if (streak > 31) {
 			mult = 8;
-			background.setFill(grad2);
+			goldMode();
 		} else if(streak > 15) {
 			mult = 4;
 		} else if(streak > 7) {
@@ -181,6 +210,8 @@ public class Playing extends GameState{
 		
 		group.getChildren().add(background);
 		group.getChildren().add(lanes);
+		group.getChildren().add(inLines);
+		
 
 		for(Circle c : goals) {
 			group.getChildren().add(c);
@@ -287,7 +318,7 @@ public class Playing extends GameState{
 	public void miss() {
 		missed ++;
 		score -= 100;
-		background.setFill(grad1);
+		purpleMode();
 		streak = 0;
 		mult = 1;
 		
@@ -350,6 +381,51 @@ public class Playing extends GameState{
 				
 			}
 		}
+	}
+	
+	public void goldMode() {
+		//background.setFill(grad2);
+		//lanes.setFill(Color.web("#212020", 0.9));
+		complete.setFill(gradGoal2);
+		backAcc.setStroke(gradGoal2);
+		backAcc.setStrokeWidth(3);
+		backAcc.setStrokeType(StrokeType.OUTSIDE);
+		
+		backMult.setStroke(gradGoal2);
+		backMult.setStrokeWidth(3);
+		backMult.setStrokeType(StrokeType.OUTSIDE);
+		
+		lanes.setStroke(gradGoal22);
+		lanes.setStrokeWidth(6);
+		
+	
+		/*
+		for(Circle c : goals) {
+			c.setStroke(gradGoal22);
+			c.setStrokeWidth(3);
+			c.setStrokeType(StrokeType.INSIDE);
+		}
+		*/
+	}
+	
+	public void purpleMode() {
+		background.setFill(grad1);
+		lanes.setFill(Color.web("#773272", 0.7));
+		complete.setFill(gradGoal);
+		
+		backAcc.setStroke(null);
+		backMult.setStroke(null);
+		
+		lanes.setStroke(Color.web("#513a5b", 0.8));
+		lanes.setStrokeWidth(5);
+		
+		/*
+		for(Circle c : goals) {
+			c.setStroke(null);
+		}
+		*/
+		
+		
 	}
 	
 	

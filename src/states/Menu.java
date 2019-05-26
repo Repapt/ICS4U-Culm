@@ -87,7 +87,7 @@ public class Menu extends GameState {
 	@Override
 	public void update(int counter) {
 		
-		backX += 0.002;
+		backX += 0.005;
 		//System.out.println(Arrays.toString(gradStops));
 
 				

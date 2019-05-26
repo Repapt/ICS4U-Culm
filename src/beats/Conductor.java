@@ -41,12 +41,14 @@ public class Conductor {
 		actualStart[1] =  0.456;
 		actualStart[2] = 10.722;
 		
+		
+		bpm[0] = 152;
 		bpm[1] = 125;
 		bpm[2] = 95;
 		bpm[3] = 100;
 		
 		
-		songs[0] = new Media(getClass().getResource("Take On Me.mp3").toExternalForm());
+		songs[0] = new Media(getClass().getResource("Wilson (Expensive Mistakes).wav").toExternalForm());
 		songs[1] = new Media(getClass().getResource("01 What Makes You Beautiful.m4a").toExternalForm());
 		songs[2] = new Media(getClass().getResource("Closer.mp3").toExternalForm());
 		songs[3] = new Media(getClass().getResource("Happier.wav").toExternalForm());
