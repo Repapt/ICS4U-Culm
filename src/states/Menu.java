@@ -4,11 +4,13 @@ import java.util.Arrays;
 
 import javafx.scene.Group;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import main.Main;
 import tools.Flash;
 import tools.Print;
@@ -25,6 +27,12 @@ public class Menu extends GameState {
 	double[] gradStops;
 	
 	double backX = 0;
+	
+	int currSet = 0;
+	
+	String[] keys = new String[3];
+	
+	Print[] keySet = new Print[3];
 	
 	public Menu(Main g) {
 		super(g);
@@ -50,7 +58,11 @@ public class Menu extends GameState {
 		gradStops[6] = 1;
 		
 		
-		startText = new Print(40, 400, -1, Color.WHITE, "Press any key to begin");
+		for(int i=0;i<3;i++) {
+			keys[i] = "";
+			keySet[i] = new Print(40, 100*(i+1) + 50, -1, Color.WHITE, "Lane 1: " + keys[i]);
+		}
+		startText = new Print(40, 450, -1, Color.WHITE, "Click here to begin");
 		
 		backGrad = new LinearGradient(1, 0, 0, 0, true, CycleMethod.NO_CYCLE, 
 				
@@ -90,7 +102,9 @@ public class Menu extends GameState {
 		backX += 0.005;
 		//System.out.println(Arrays.toString(gradStops));
 
-				
+		for(int i=0;i<3;i++) {
+			keySet[i].setText("Lane 1: " + keys[i]);
+		}
 		
 		background.setX(1400*Math.sin(backX) - 1400);
 		
@@ -100,6 +114,23 @@ public class Menu extends GameState {
 	public void keyPress(KeyEvent event) {
 		
 		
+		keys[currSet] = event.getText().toUpperCase();
+		
+		
+		
+	}
+	
+	public void click(MouseEvent event) {
+		double y = event.getY();
+		if(y > 100 && y < 200) {
+			currSet = 0;
+		} else if (y > 200 && y < 300) {
+			currSet = 1;
+		} else if (y > 300 && y < 400) {
+			currSet = 2;
+		} else if (y > 400 && y < 500) {
+			game.changeState(new Playing(game, keys));
+		}
 	}
 
 	@Override
@@ -108,11 +139,14 @@ public class Menu extends GameState {
 		group.getChildren().add(background);
 		
 		group.getChildren().add(startText.getText());
+		
+		for(int i=0;i<3;i++) {
+			group.getChildren().add(keySet[i].getText());
+		}
 	}
 
 	@Override
 	public void keyRelease(KeyEvent event) {
-		game.changeState(new Playing(game));
 		
 	}
 

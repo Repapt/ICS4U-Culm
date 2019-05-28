@@ -12,6 +12,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -64,6 +65,15 @@ public class Main extends Application{
 			
 			public void handle(KeyEvent event) {
 				game.keyPress(event);
+			}
+			
+		}
+		);	
+		
+		scene.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>(){
+			
+			public void handle(MouseEvent event) {
+				game.click(event);
 			}
 			
 		}

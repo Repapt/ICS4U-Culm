@@ -59,16 +59,24 @@ public class Conductor {
 		tickSize = LoadMidi.resolution * (bpm[songNum]/60);
 		tickSize = 1.0/tickSize;
 		
-		beatSpeed = (height - 50.0)*(bpm[songNum]/7200);
+		//t = bpm/60
+		//travel 550 in t
+		//speed = 550/(t)
+		//updates 60 times per sec, so
+		//speed = speed/60
+		
+		beatSpeed = (height-100.0)*(bpm[songNum]/7200);
 		travelTime = (height-50.0)/(60*beatSpeed);
-		beatTime = actualStart[songNum] - travelTime;
+		//System.out.println(travelTime);
+		//beatTime = travelTime;
 		
 		
 	}
-	
+	/*
 	public void addBeat() {
 		beatTime += increment;
 	}
+	*/
 	
 	public double getTickSize() {
 		return tickSize;

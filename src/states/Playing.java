@@ -2,14 +2,19 @@ package states;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import javax.sound.midi.InvalidMidiDataException;
 
 import beats.Beat;
 import beats.Conductor;
+import beats.DrumSound;
 import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -21,6 +26,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextBoundsType;
 import main.Main;
 import tools.LoadMidi;
 import tools.Print;
@@ -30,6 +36,8 @@ public class Playing extends GameState{
 	Main game;
 
 	ArrayList<Beat>[] beats = new ArrayList[3];
+	
+	ArrayList<DrumSound> drums = new ArrayList<DrumSound>();
 	
 	Rectangle background, lanes, backMult, backAcc, complete, total, inLines;
 	
@@ -45,25 +53,40 @@ public class Playing extends GameState{
 	double currPos = 0;
 	int numBeats = 0;
 	
+	Text[] keys = new Text[3];
+	
 	long gameStart;
 	boolean started = false;
 	
 	Circle[] goals = new Circle[3];
 	
+	Circle[] smallGoals = new Circle[3];
+	
 	Conductor conductor;
 	
 	ArrayList<Print> toPrint = new ArrayList<Print>();
 	Text scoreText;
+
 	
-	public Playing(Main g) {
+	
+	public Playing(Main g, String[] keys) {
 		
 		super(g);
-		
 		
 		game = g;
 		
 		for(int i=0;i<3;i++) {
+			
+			this.keys[i] = new Text(keys[i]);
+			this.keys[i].setBoundsType(TextBoundsType.VISUAL);
+			this.keys[i].setFill(Color.web("#3d0f5b", 0.2));
+			this.keys[i].setFont(Font.font("roberto", FontWeight.BOLD, 120));
+			
+			this.keys[i].setX(100*(i) + 100-(this.keys[i].getBoundsInLocal().getWidth()/2));
+			this.keys[i].setY(500 + (this.keys[i].getBoundsInLocal().getHeight()/2));
+			
 			beats[i] = new ArrayList<Beat>();
+			
 		}
 		
 		Print scoreText = new Print(50, 45, -1, Color.WHITE, "Score: " + score);
@@ -82,15 +105,14 @@ public class Playing extends GameState{
 				            new Stop(1, Color.web("#ed5fc2")),
 				});
 		
-		grad2 = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, 
+		grad2 = new LinearGradient(1, 1, 0, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
 				           
-				            new Stop(0, Color.web("#fff716")),
-				            new Stop(0.3, Color.web("#fcffaf")),
-				            new Stop(0.57, Color.web("#ffd016")),
-				            new Stop(0.78, Color.web("#fcffaf")),
-				            new Stop(1, Color.web("#ffea99")),
-				});
+			            new Stop(0, Color.web("#ffe2fc")),
+			            new Stop(0.2, Color.web("#db27c8")),
+			            new Stop(0.4, Color.web("#d850c7")),
+			            new Stop(1, Color.web("#ffe0fb")),
+			});
 		
 		gradGoal = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
@@ -118,12 +140,16 @@ public class Playing extends GameState{
 			            new Stop(0.4, Color.web("#d8c550", 0.85)),
 			            new Stop(1, Color.web("#fffde0", 0.85)),
 			});
+	
 		
-
-		
-		goals[0] = new Circle(100 ,500,50, gradGoal);
-		goals[1] = new Circle(200 ,500,50, gradGoal);
-		goals[2] = new Circle(300 ,500,50, gradGoal);
+		for(int i=0;i<3;i++) {
+			goals[i] = new Circle(100*(i+1), 500, 50, null);
+			goals[i].setStroke(gradGoal);
+			goals[i].setStrokeWidth(5);
+			goals[i].setStrokeType(StrokeType.INSIDE);
+			smallGoals[i] = new Circle(100*i + 100, 500, 25, grad2);
+			
+		}
 		
 		
 		background = new Rectangle(width, height, grad1);
@@ -152,7 +178,7 @@ public class Playing extends GameState{
 		
 				
 		try {
-			conductor = new Conductor(0, height);
+			conductor = new Conductor(3, height);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -185,7 +211,11 @@ public class Playing extends GameState{
 		}
 		
 		genBeats();
-		accuracy = ((double)(hits) + 1)/((missed + hits) + 1);
+		if(missed + hits == 0) {
+			accuracy = 0;
+		} else {
+			accuracy = ((double)(hits))/((missed + hits));
+		}
 		
 		
 		toPrint.get(0).setText("Score: " + score);
@@ -202,21 +232,27 @@ public class Playing extends GameState{
 			mult = 2;
 		} 
 		
+		for(int i=0;i<drums.size();i++) {
+			if(drums.get(0).isEnded()) {
+				drums.remove(0);
+			}
+		}
+		
 		//System.out.println(conductor.songPosition());
 		
 	}
-	
 	public void draw(Group group) {
 		
 		group.getChildren().add(background);
 		group.getChildren().add(lanes);
 		group.getChildren().add(inLines);
-		
 
-		for(Circle c : goals) {
-			group.getChildren().add(c);
+		for(int i=0;i<3;i++) {
+			group.getChildren().add(goals[i]);
+			group.getChildren().add(smallGoals[i]);
+			group.getChildren().add(keys[i]);
+			
 		}
-		
 		group.getChildren().add(total);
 		group.getChildren().add(complete);
 		
@@ -227,12 +263,14 @@ public class Playing extends GameState{
 			for(int j=0;j<curr.size();j++) {
 				Beat currBeat = curr.get(j);
 				if(currBeat.getY() > 490 && currBeat.getY() < 510) {
+					
 					currBeat.move(false);
 				} else {
 					currBeat.move(true);
 				}
 				
 				group.getChildren().add(currBeat.circle);
+				group.getChildren().add(currBeat.iView);
 				if(currBeat.getY() > height-1) {
 					toPrint.add(new Print(currBeat.getX()-25, currBeat.getY()-25, 15, Color.RED, "miss"));
 					curr.remove(j);
@@ -262,14 +300,18 @@ public class Playing extends GameState{
 	public void keyRelease(KeyEvent event) {
 		
 	}
+	public void click(MouseEvent event) {
+		
+	}
 	
 	public void keyPress(KeyEvent event) {
-		String key  = event.getCode().toString();
-		if(key.equals("A")) {
+		String key  = event.getText().toUpperCase();
+		System.out.println(key);
+		if(key.equals(keys[0].getText())) {
 			checkHit(0);
-		} else if (key.equals("S")) {
+		} else if (key.equals(keys[1].getText())) {
 			checkHit(1);
-		} else if (key.equals("D")) {
+		} else if (key.equals(keys[2].getText())) {
 			checkHit(2);
 			
 		}
@@ -277,6 +319,8 @@ public class Playing extends GameState{
 	
 	private void checkHit(int lane) {
 		int len = beats[lane].size();
+		
+		drums.add(new DrumSound());
 
 
 		if(len == 0) {
@@ -290,15 +334,15 @@ public class Playing extends GameState{
 			for(int i=0;i<len;i++) {
 				curr = beats[lane].get(i);
 				y = curr.getY();
-				if(!(curr.getY() > 575)) {
+				if(!(curr.getY() > 590)) {
 					break;
 				}
 			}
-			if(y < 575 && y > 450) {
+			if(y < 560 && y > 440) {
 				
 				if(y < 510 && y > 490) {
 					score += 100*mult;
-					toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.PURPLE, "perfect!"));
+					toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.GOLD, "perfect!"));
 
 				} else {
 					score += 50*mult;
@@ -323,7 +367,6 @@ public class Playing extends GameState{
 		mult = 1;
 		
 	}
-	
 	public void genBeats() {
 		
 		if(LoadMidi.beats.size() == 0) {
@@ -367,9 +410,10 @@ public class Playing extends GameState{
 						}
 						beats[lane].add(new Beat(lane, conductor.getBeatSpeed()));
 			
-						conductor.addBeat();
+						//conductor.addBeat();
 						
 						LoadMidi.beats.remove(0);
+						
 						
 					} else {
 						break;
@@ -410,7 +454,6 @@ public class Playing extends GameState{
 	
 	public void purpleMode() {
 		background.setFill(grad1);
-		lanes.setFill(Color.web("#773272", 0.7));
 		complete.setFill(gradGoal);
 		
 		backAcc.setStroke(null);
@@ -430,6 +473,7 @@ public class Playing extends GameState{
 	
 	
 	public void startAnim() throws Exception {
+		/*
 		long start = System.nanoTime();
 		TimeUnit.SECONDS.sleep(1);
 		long end = System.nanoTime();
@@ -444,6 +488,7 @@ public class Playing extends GameState{
 		TimeUnit.SECONDS.sleep(1);
 		end = System.nanoTime();
 		System.out.println(end - start);
+		*/
 		
 		gameStart = System.nanoTime();
 
