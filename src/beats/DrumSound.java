@@ -11,7 +11,7 @@ public class DrumSound {
 	public DrumSound() {
 		sound = new Media(getClass().getResource("Drum.wav").toExternalForm());
 		player = new MediaPlayer(sound);
-		player.setVolume(0.5);
+		player.setVolume(0.15);
 		player.play();
 	
 	}

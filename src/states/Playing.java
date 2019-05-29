@@ -79,7 +79,7 @@ public class Playing extends GameState{
 			
 			this.keys[i] = new Text(keys[i]);
 			this.keys[i].setBoundsType(TextBoundsType.VISUAL);
-			this.keys[i].setFill(Color.web("#3d0f5b", 0.2));
+			this.keys[i].setFill(Color.web("#3d0f5b", 0.35));
 			this.keys[i].setFont(Font.font("roberto", FontWeight.BOLD, 120));
 			
 			this.keys[i].setX(100*(i) + 100-(this.keys[i].getBoundsInLocal().getWidth()/2));
@@ -147,6 +147,7 @@ public class Playing extends GameState{
 			goals[i].setStroke(gradGoal);
 			goals[i].setStrokeWidth(5);
 			goals[i].setStrokeType(StrokeType.INSIDE);
+			
 			smallGoals[i] = new Circle(100*i + 100, 500, 25, grad2);
 			
 		}
@@ -178,7 +179,7 @@ public class Playing extends GameState{
 		
 				
 		try {
-			conductor = new Conductor(3, height);
+			conductor = new Conductor(4, height);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -237,6 +238,7 @@ public class Playing extends GameState{
 				drums.remove(0);
 			}
 		}
+		
 		
 		//System.out.println(conductor.songPosition());
 		
@@ -306,7 +308,6 @@ public class Playing extends GameState{
 	
 	public void keyPress(KeyEvent event) {
 		String key  = event.getText().toUpperCase();
-		System.out.println(key);
 		if(key.equals(keys[0].getText())) {
 			checkHit(0);
 		} else if (key.equals(keys[1].getText())) {

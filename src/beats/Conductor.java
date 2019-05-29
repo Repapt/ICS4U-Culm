@@ -10,7 +10,7 @@ import tools.LoadMidi;
 
 public class Conductor {
 	
-	int numSongs = 4;
+	int numSongs = 5;
 	
 	double[] bpm = new double[numSongs];
 	double[] actualStart = new double[numSongs];
@@ -46,12 +46,14 @@ public class Conductor {
 		bpm[1] = 125;
 		bpm[2] = 95;
 		bpm[3] = 100;
+		bpm[4] = 170;
 		
 		
 		songs[0] = new Media(getClass().getResource("Wilson (Expensive Mistakes).wav").toExternalForm());
 		songs[1] = new Media(getClass().getResource("01 What Makes You Beautiful.m4a").toExternalForm());
 		songs[2] = new Media(getClass().getResource("Closer.mp3").toExternalForm());
 		songs[3] = new Media(getClass().getResource("Happier.wav").toExternalForm());
+		songs[4] = new Media(getClass().getResource("Can't You See.wav").toExternalForm());
 		
 		player = new MediaPlayer(songs[songNum]);
 		increment = 60/bpm[songNum];
@@ -129,7 +131,7 @@ public class Conductor {
 		songTime += System.nanoTime()/1000000000.0 - prevFrame;
 		prevFrame = System.nanoTime()/1000000000.0;
 		
-		if(Math.abs(songPosition() - songLength()) < 0.01) {
+		if(Math.abs(songPosition() - songLength()) < 0.05) {
 			return 1;
 			
 		} else if (player.getCurrentTime().toSeconds() != lastPos) {

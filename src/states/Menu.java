@@ -57,9 +57,12 @@ public class Menu extends GameState {
 		gradStops[5] = 5.0/6;
 		gradStops[6] = 1;
 		
+		keys[0] = "A";
+		keys[1] = "S";
+		keys[2] = "D";
+		
 		
 		for(int i=0;i<3;i++) {
-			keys[i] = "";
 			keySet[i] = new Print(40, 100*(i+1) + 50, -1, Color.WHITE, "Lane 1: " + keys[i]);
 		}
 		startText = new Print(40, 450, -1, Color.WHITE, "Click here to begin");
