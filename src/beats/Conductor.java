@@ -42,16 +42,19 @@ public class Conductor {
 		bpm[0] = 152;
 		bpm[1] = 100;
 		bpm[2] = 170;
+		bpm[3] = 90;
 		
 		beatVol[0] = 0.15;
 		beatVol[1] = 0.07;
 		beatVol[2] = 0.3;
+		beatVol[3] = 0.15;
 		
 		songNames[0] = "Wilson (Expensive Mistakes)";
 		songNames[1] = "Happier";
 		songNames[2] = "Can't You See";
+		songNames[3] = "Sunflower";
 		
-		for(int i=0;i<3;i++) {
+		for(int i=0;i<4;i++) {
 			songs[i] = new Media(getClass().getResource(songNames[i] + ".wav").toExternalForm());
 		}
 		

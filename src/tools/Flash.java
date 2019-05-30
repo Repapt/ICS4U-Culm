@@ -10,27 +10,42 @@ public class Flash {
 	
 	public Rectangle flash;
 	public Rectangle flash2;
+	int dur = 0;
 	
-	public Flash() {
+	public Flash(int lane, int streak) {
 		LinearGradient grad1 = new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
-			            new Stop(0, Color.web("#000000", 0.9)),
-			            new Stop(0.3, Color.web("#e5e5e5e5", 0.7)),
-			            new Stop(0.5, Color.web("#ffffff", 0.7)),
-			            new Stop(0.7, Color.web("#e5e5e5e5", 0.7)),
-			            new Stop(1, Color.web("000000", 0.9)),
+			            new Stop(0, Color.web("#000000", 0)),
+			            new Stop(0.2, Color.web("#e5e5e5e5", 0.4)),
+			            new Stop(1, Color.web("000000", 0)),
 			});
-		LinearGradient grad2 = new LinearGradient(1, 0, 0, 0, true, CycleMethod.NO_CYCLE, 
+		
+		LinearGradient grad2 = new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
-			            new Stop(0, Color.web("#000000", 1)),
-			            new Stop(0.3, Color.web("#7f7f7f", 0.7)),
-			            new Stop(0.5, Color.web("#d3d3d3", 0.3)),
-			            new Stop(0.7, Color.web("#7f7f7f", 0.7)),
-			            new Stop(1, Color.web("000000", 1)),
+			            new Stop(0, Color.web("#000000", 0)),
+			            new Stop(0.2, Color.web("#d8c550", 0.75)),
+			            new Stop(1, Color.web("000000", 0)),
 			});
+		
+		if(streak > 31) {
+			flash = new Rectangle(100, 300, grad2);
+		} else {
+			flash = new Rectangle(100, 300, grad1);
+		}
+		flash.setX(100*(0.5+lane));
+		flash.setY(300);
+	}
 	
-		flash = new Rectangle(200, 400, grad1);
-		flash2 = new Rectangle(200, 400, grad2);
+	public Rectangle showFlash() {
+		return flash;
+		
 	}
 
+	public int update() {
+		dur ++;
+		if(dur > 5) {
+			return -1;
+		}
+		return 1;
+	}
 }

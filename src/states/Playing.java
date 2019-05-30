@@ -28,6 +28,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
 import main.Main;
+import tools.Flash;
 import tools.LoadMidi;
 import tools.Print;
 
@@ -38,6 +39,8 @@ public class Playing extends GameState{
 	ArrayList<Beat>[] beats = new ArrayList[3];
 	
 	ArrayList<DrumSound> drums = new ArrayList<DrumSound>();
+	
+	ArrayList<Flash> flashes = new ArrayList<Flash>();
 	
 	Rectangle background, lanes, backMult, backAcc, complete, total, inLines;
 	
@@ -254,6 +257,7 @@ public class Playing extends GameState{
 		}
 		
 		
+		
 		//System.out.println(conductor.songPosition());
 		
 	}
@@ -262,11 +266,21 @@ public class Playing extends GameState{
 		group.getChildren().add(background);
 		group.getChildren().add(lanes);
 		group.getChildren().add(inLines);
+		
+		for(int i=0;i<flashes.size();i++) {
+			Flash flash = flashes.get(i);
+			if(flash.update() == -1) {
+				flashes.remove(i);
+			} else {
+				group.getChildren().add(flash.showFlash());
+			}
+		}
 
 		for(int i=0;i<3;i++) {
+			group.getChildren().add(keys[i]);
 			group.getChildren().add(goals[i]);
 			group.getChildren().add(smallGoals[i]);
-			group.getChildren().add(keys[i]);
+			
 			
 		}
 		group.getChildren().add(total);
@@ -336,6 +350,7 @@ public class Playing extends GameState{
 		int len = beats[lane].size();
 		
 		drums.add(new DrumSound(conductor.getBeatVol()));
+		flashes.add(new Flash(lane, streak));
 
 
 		if(len == 0) {

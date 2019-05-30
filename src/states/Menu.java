@@ -157,6 +157,8 @@ public class Menu extends GameState {
 				conductor.setSong(1);
 			} else if(y > 325 && y < 400){ 
 				conductor.setSong(2);
+			} else if(y > 400 && y < 450) {
+				conductor.setSong(3);
 			} else if (y > 450 && y < 550) {
 				page = 0;
 			} 
