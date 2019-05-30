@@ -18,6 +18,7 @@ import javafx.scene.text.Text;
 import main.Main;
 import tools.Flash;
 import tools.Images;
+import tools.Dash;
 import tools.Print;
 
 public class Menu extends GameState {
@@ -46,6 +47,8 @@ public class Menu extends GameState {
 	Print[] nav = new Print[3];
 	
 	Print[] songNames;
+	
+	ArrayList<Dash> lines = new ArrayList<Dash>();
 	
 	ImageView title;
 	
@@ -80,12 +83,12 @@ public class Menu extends GameState {
 			keySet[i] = new Print(40, 100*(i+2), -1, Color.WHITE, "Lane 1: " + keys[i]);
 		}
 		startText = new Print(40, 500, -1, Color.WHITE, "Click here to begin");
-		
+		Color thing = Color.web("#7b0b7c");
 		backGrad = new LinearGradient(1, 1, 1, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[] {
-				new Stop(gradStops[0], Color.web("#E3170A")),
+				new Stop(gradStops[0], thing),
 				new Stop(gradStops[1], Color.web("#000000")),
-				new Stop(gradStops[2], Color.web("#E3170A")),
+				new Stop(gradStops[2], thing),
 	            new Stop(gradStops[3], Color.web("#000000"))    
         
 		});
@@ -106,6 +109,17 @@ public class Menu extends GameState {
 
 	@Override
 	public void update(int counter) {
+		
+		if(Math.random() < 0.3) {
+			lines.add(new Dash());
+		}
+		
+		for(int i=0;i<lines.size();i++) {
+			Dash curr = lines.get(i);
+			if(curr.update() == -1 || curr.getX() > 400 || curr.getY() > 600) {
+				lines.remove(i);
+			}
+		}
 		
 		backY += 0.005;
 		//System.out.println(Arrays.toString(gradStops));
@@ -172,6 +186,10 @@ public class Menu extends GameState {
 	public void draw(Group group) {
 		
 		group.getChildren().add(background);
+		
+		for(int i=0;i<lines.size();i++) {
+			group.getChildren().add(lines.get(i).getRect());
+		}
 		
 		if(page == 0) {
 			group.getChildren().add(startText.getText());

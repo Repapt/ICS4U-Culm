@@ -84,6 +84,7 @@ public class Main extends Application{
 			int counter = 0;
 			
 			public void handle(long currTime) {
+			
 				counter ++;
 				root.getChildren().clear();
 				
