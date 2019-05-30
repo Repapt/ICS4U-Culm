@@ -1,6 +1,7 @@
 package tools;
 
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -12,7 +13,7 @@ public class Print {
 	int dur;
 	int count = 0;
 	
-	public Print(double x, double y, int dur, Color color, String words) {
+	public Print(double x, double y, int dur, Paint color, String words) {
 		
 		text = new Text(words);
 		text.setFill(color);

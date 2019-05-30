@@ -1,10 +1,14 @@
 package states;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import beats.Conductor;
 import javafx.scene.Group;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.media.Media;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -13,6 +17,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import main.Main;
 import tools.Flash;
+import tools.Images;
 import tools.Print;
 
 public class Menu extends GameState {
@@ -24,76 +29,76 @@ public class Menu extends GameState {
 	Rectangle background;
 	LinearGradient backGrad;
 	
+	Conductor conductor;
+	
 	double[] gradStops;
 	
-	double backX = 0;
+	double backY = 0;
 	
 	int currSet = 0;
+	
+	int numSongs;
 	
 	String[] keys = new String[3];
 	
 	Print[] keySet = new Print[3];
 	
-	public Menu(Main g) {
+	Print[] nav = new Print[3];
+	
+	Print[] songNames;
+	
+	ImageView title;
+	
+	int page = 0;
+	
+	public Menu(Main g) throws Exception{
 		super(g);
 		game = g;
 		
-		/*
-		gradStops = new double[8];
-		gradStops[1] = -2;
-		gradStops[2] = -0.66;
-		gradStops[3] = -1.33;
-		gradStops[4] = 0;
-		gradStops[5] = 0.66;
-		gradStops[6] = 1.33;
-		gradStops[7] = 2;
-		*/
-		gradStops = new double[7];
+		conductor = new Conductor(0, height);
+		
+		gradStops = new double[4];
 		gradStops[0] = 0;
-		gradStops[1] = 1.0/6;
-		gradStops[2] = 2.0/6;
-		gradStops[3] = 3.0/6;
-		gradStops[4] = 4.0/6;
-		gradStops[5] = 5.0/6;
-		gradStops[6] = 1;
+		gradStops[1] = 1/3.0;
+		gradStops[2] = 2/3.0;
+		gradStops[3] = 1;
 		
 		keys[0] = "A";
 		keys[1] = "S";
 		keys[2] = "D";
 		
+		title = Images.titleV;
+		title.setPreserveRatio(true);
+		title.setFitWidth(400);
+		
+		nav[0] = new Print(40, 500, -1, Color.WHITE, "back");
+		nav[1] = new Print(40, 200, -1, Color.WHITE, "Controls");
+		nav[2] = new Print(40, 300, -1, Color.WHITE, "Song Select");
+		
 		
 		for(int i=0;i<3;i++) {
-			keySet[i] = new Print(40, 100*(i+1) + 50, -1, Color.WHITE, "Lane 1: " + keys[i]);
+			keySet[i] = new Print(40, 100*(i+2), -1, Color.WHITE, "Lane 1: " + keys[i]);
 		}
-		startText = new Print(40, 450, -1, Color.WHITE, "Click here to begin");
+		startText = new Print(40, 500, -1, Color.WHITE, "Click here to begin");
 		
-		backGrad = new LinearGradient(1, 0, 0, 0, true, CycleMethod.NO_CYCLE, 
-				
+		backGrad = new LinearGradient(1, 1, 1, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[] {
-				/*
-				new Stop(gradStops[0], Color.web("#f8bd55")),
-	            new Stop(gradStops[1], Color.web("#c0fe56")),
-	            new Stop(gradStops[2], Color.web("#5dfbc1")),
-	            new Stop(gradStops[3], Color.web("#64c2f8")),
-	            new Stop(gradStops[4], Color.web("#be4af7")),
-	            new Stop(gradStops[5], Color.web("#ed5fc2")),
-	            new Stop(gradStops[6], Color.web("#ef504c")),
-	            new Stop(gradStops[7], Color.web("#f2660f")),
-	            */
-				
-				new Stop(gradStops[0], Color.web("#12d19e")),
-	            new Stop(gradStops[1], Color.web("#1b9be5")),
-	            new Stop(gradStops[2], Color.web("#141bd1")),
-	            new Stop(gradStops[3], Color.web("#5112ce")),
-	            new Stop(gradStops[4], Color.web("#c10de5")),
-	            new Stop(gradStops[5], Color.web("#e50dbd")),
-	            new Stop(gradStops[6], Color.web("#f20450"))
-	            
+				new Stop(gradStops[0], Color.web("#E3170A")),
+				new Stop(gradStops[1], Color.web("#000000")),
+				new Stop(gradStops[2], Color.web("#E3170A")),
+	            new Stop(gradStops[3], Color.web("#000000"))    
         
 		});
 				
+		background = new Rectangle(width, height*6, backGrad);
 		
-		background = new Rectangle(width*8, height, backGrad);
+		numSongs = conductor.getSongList().length;
+		songNames = new Print[numSongs];
+		
+		for(int i=0;i<numSongs; i++) {
+			String song = conductor.getSongList()[i];
+			songNames[i] = new Print(40, 75*(i+3), -1, Color.WHITE, song);
+		}
 	
 				
 	
@@ -102,37 +107,62 @@ public class Menu extends GameState {
 	@Override
 	public void update(int counter) {
 		
-		backX += 0.005;
+		backY += 0.005;
 		//System.out.println(Arrays.toString(gradStops));
 
 		for(int i=0;i<3;i++) {
 			keySet[i].setText("Lane 1: " + keys[i]);
 		}
 		
-		background.setX(1400*Math.sin(backX) - 1400);
+		background.setY(1500*Math.sin(backY) - 1500);
 		
 	}
 
 	@Override
 	public void keyPress(KeyEvent event) {
 		
-		
-		keys[currSet] = event.getText().toUpperCase();
+		if(page == 1) {
+			keys[currSet] = event.getText().toUpperCase();
+		}
 		
 		
 		
 	}
 	
-	public void click(MouseEvent event) {
+	public void click(MouseEvent event){
 		double y = event.getY();
-		if(y > 100 && y < 200) {
-			currSet = 0;
-		} else if (y > 200 && y < 300) {
-			currSet = 1;
-		} else if (y > 300 && y < 400) {
-			currSet = 2;
-		} else if (y > 400 && y < 500) {
-			game.changeState(new Playing(game, keys));
+		if(page == 1) {
+			if(y > 150 && y < 250) {
+				currSet = 0;
+			} else if (y > 250 && y < 350) {
+				currSet = 1;
+			} else if (y > 350 && y < 450) {
+				currSet = 2;
+			} else if (y > 450 && y < 550) {
+				page = 0;
+			}
+		} else if (page == 0) {
+			if(y > 150 && y < 250) {
+				page = 1;
+			} else if (y > 250 && y < 350) {
+				page = 2;
+			} else if (y > 450 && y < 550) {
+				game.changeState(new Playing(game, keys, conductor));
+			}
+		} else if(page ==2) {
+			
+			if(y > 175 && y < 250) {
+				conductor.setSong(0);
+			} else if (y > 250 && y < 325) {
+				conductor.setSong(1);
+			} else if(y > 325 && y < 400){ 
+				conductor.setSong(2);
+			} else if (y > 450 && y < 550) {
+				page = 0;
+			} 
+			
+			System.out.println(conductor.getSongName());
+			
 		}
 	}
 
@@ -141,11 +171,24 @@ public class Menu extends GameState {
 		
 		group.getChildren().add(background);
 		
-		group.getChildren().add(startText.getText());
-		
-		for(int i=0;i<3;i++) {
-			group.getChildren().add(keySet[i].getText());
+		if(page == 0) {
+			group.getChildren().add(startText.getText());
+			group.getChildren().add(nav[1].getText());
+			group.getChildren().add(nav[2].getText());
+		} else if(page == 1) {
+			for(int i=0;i<3;i++) {
+				group.getChildren().add(keySet[i].getText());
+			}
+			group.getChildren().add(nav[0].getText());
+		} else if (page == 2) {
+			for(int i=0;i<numSongs; i++) {
+				group.getChildren().add(songNames[i].getText());
+			}
+			
+			group.getChildren().add(nav[0].getText());
 		}
+		
+		group.getChildren().add(title);
 	}
 
 	@Override

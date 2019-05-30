@@ -9,6 +9,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
+import tools.Images;
 
 public class Beat {
 		
@@ -29,7 +30,6 @@ public class Beat {
 	public Circle circle = new Circle(x, y, 25, gradient);	
 	
 	public Image image = new Image(this.getClass().getResourceAsStream("beat.png"));
-	
 	public ImageView iView = new ImageView(image);
 	
 	

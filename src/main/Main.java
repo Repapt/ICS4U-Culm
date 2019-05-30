@@ -17,6 +17,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import states.*;
+import tools.Images;
 
 public class Main extends Application{
 	
@@ -27,9 +28,9 @@ public class Main extends Application{
 	public ArrayList<Beat> beats;
 	GameState game;
 	
-	UserInput input = new UserInput();
 
 	public static void main(String[] args) {
+		Images.load();
 		launch(args);
 	}
 	
@@ -45,7 +46,7 @@ public class Main extends Application{
 		
 		Group root = new Group();
 		
-		mainStage.setTitle("Weezer");
+		mainStage.setTitle("Impulse");
 		
 		
 		game = new Menu(this);

@@ -13,13 +13,15 @@ public class Conductor {
 	int numSongs = 5;
 	
 	double[] bpm = new double[numSongs];
-	double[] actualStart = new double[numSongs];
+	double[] beatVol = new double[numSongs];
 	double prevFrame, songTime = 0, lastPos = 0;
 	double increment;
 	
 	double beatSpeed, beatTime, travelTime;
 		
 	Media[] songs = new Media[numSongs];
+	
+	String[] songNames = new String[numSongs];
 	
 	double[] delays = new double[numSongs];
 
@@ -32,34 +34,29 @@ public class Conductor {
 	MediaPlayer player;
 	
 	public Conductor(int songNum, double height) throws Exception {
-
-		LoadMidi.load(songNum);
 		
 		this.songNum = songNum;
 		this.height = height;
 		
-		actualStart[1] =  0.456;
-		actualStart[2] = 10.722;
-		
 		
 		bpm[0] = 152;
-		bpm[1] = 125;
-		bpm[2] = 95;
-		bpm[3] = 100;
-		bpm[4] = 170;
+		bpm[1] = 100;
+		bpm[2] = 170;
 		
+		beatVol[0] = 0.15;
+		beatVol[1] = 0.07;
+		beatVol[2] = 0.3;
 		
-		songs[0] = new Media(getClass().getResource("Wilson (Expensive Mistakes).wav").toExternalForm());
-		songs[1] = new Media(getClass().getResource("01 What Makes You Beautiful.m4a").toExternalForm());
-		songs[2] = new Media(getClass().getResource("Closer.mp3").toExternalForm());
-		songs[3] = new Media(getClass().getResource("Happier.wav").toExternalForm());
-		songs[4] = new Media(getClass().getResource("Can't You See.wav").toExternalForm());
+		songNames[0] = "Wilson (Expensive Mistakes)";
+		songNames[1] = "Happier";
+		songNames[2] = "Can't You See";
+		
+		for(int i=0;i<3;i++) {
+			songs[i] = new Media(getClass().getResource(songNames[i] + ".wav").toExternalForm());
+		}
 		
 		player = new MediaPlayer(songs[songNum]);
 		increment = 60/bpm[songNum];
-		
-		tickSize = LoadMidi.resolution * (bpm[songNum]/60);
-		tickSize = 1.0/tickSize;
 		
 		//t = bpm/60
 		//travel 550 in t
@@ -80,17 +77,36 @@ public class Conductor {
 	}
 	*/
 	
-	public double getTickSize() {
-		return tickSize;
-		
-	}
 	
 	
-	public void play() {
+	public void play() throws InvalidMidiDataException, IOException {
+		LoadMidi.load(songNum);
+		tickSize = LoadMidi.resolution * (bpm[songNum]/60);
+		tickSize = 1.0/tickSize;
 		prevFrame = System.nanoTime()/1000000000.0;
 		player.play();
 	}
 	
+	public void setSong(int num){
+		songNum = num;
+		player = new MediaPlayer(songs[songNum]);
+	}
+	
+	public double getTickSize() {
+		return tickSize;
+	}
+	
+	public String[] getSongList() {
+		return songNames;
+	}
+	
+	public String getSongName() {
+		return songNames[songNum];
+	}
+	
+	public double getBeatVol() {
+		return beatVol[songNum];
+	}
 	public double getTravelTime() {
 		return travelTime;
 	}
@@ -119,9 +135,6 @@ public class Conductor {
 		return increment;
 	}
 	
-	public double getActualStart() {
-		return actualStart[songNum];
-	}
 	
 	public double songLength() {
 		return player.getTotalDuration().toSeconds();

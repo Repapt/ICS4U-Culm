@@ -8,10 +8,10 @@ public class DrumSound {
 	Media sound;
 	MediaPlayer player;
 	
-	public DrumSound() {
+	public DrumSound(double vol) {
 		sound = new Media(getClass().getResource("Drum.wav").toExternalForm());
 		player = new MediaPlayer(sound);
-		player.setVolume(0.15);
+		player.setVolume(vol);
 		player.play();
 	
 	}
