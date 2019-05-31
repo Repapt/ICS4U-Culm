@@ -143,6 +143,7 @@ public class Conductor {
 		return player.getTotalDuration().toSeconds();
 	}
 	
+	
 	public int update() {
 		songTime += System.nanoTime()/1000000000.0 - prevFrame;
 		prevFrame = System.nanoTime()/1000000000.0;
@@ -160,6 +161,14 @@ public class Conductor {
 		return 0;
 		
 		
+	}
+	
+	public void pause() {
+		player.pause();
+	}
+	public void unpause() {
+		prevFrame = System.nanoTime()/1000000000.0;
+		player.play();
 	}
 	
 	

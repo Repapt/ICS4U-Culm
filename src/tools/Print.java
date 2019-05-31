@@ -20,6 +20,7 @@ public class Print {
 		text.setX(x);
 		text.setY(y);
 		text.setFont(Font.font("roberto", FontWeight.BOLD, 30));
+		//text.setFont(Images.font);
 		this.dur = dur;
 		
 	}

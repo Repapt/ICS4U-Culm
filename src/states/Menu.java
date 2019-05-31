@@ -40,9 +40,9 @@ public class Menu extends GameState {
 	
 	int numSongs;
 	
-	String[] keys = new String[3];
+	String[] keys = new String[4];
 	
-	Print[] keySet = new Print[3];
+	Print[] keySet = new Print[4];
 	
 	Print[] nav = new Print[3];
 	
@@ -69,6 +69,7 @@ public class Menu extends GameState {
 		keys[0] = "A";
 		keys[1] = "S";
 		keys[2] = "D";
+		keys[3] = "P";
 		
 		title = Images.titleV;
 		title.setPreserveRatio(true);
@@ -80,8 +81,9 @@ public class Menu extends GameState {
 		
 		
 		for(int i=0;i<3;i++) {
-			keySet[i] = new Print(40, 100*(i+2), -1, Color.WHITE, "Lane 1: " + keys[i]);
+			keySet[i] = new Print(40, 75*(i+3), -1, Color.WHITE, "Lane 1: " + keys[i]);
 		}
+		keySet[3] = new Print(40, 75*6, -1, Color.WHITE, "Pause: " + keys[3]);
 		startText = new Print(40, 500, -1, Color.WHITE, "Click here to begin");
 		Color thing = Color.web("#7b0b7c");
 		backGrad = new LinearGradient(1, 1, 1, 0, true, CycleMethod.NO_CYCLE, 
@@ -116,17 +118,19 @@ public class Menu extends GameState {
 		
 		for(int i=0;i<lines.size();i++) {
 			Dash curr = lines.get(i);
-			if(curr.update() == -1 || curr.getX() > 400 || curr.getY() > 600) {
+			curr.update();
+			if(curr.getX() > 400 || curr.getY() > 600) {
 				lines.remove(i);
 			}
 		}
 		
-		backY += 0.005;
+		backY += 0.003;
 		//System.out.println(Arrays.toString(gradStops));
 
 		for(int i=0;i<3;i++) {
 			keySet[i].setText("Lane 1: " + keys[i]);
 		}
+		keySet[3].setText("Pause: " + keys[3]);
 		
 		background.setY(1500*Math.sin(backY) - 1500);
 		
@@ -146,13 +150,15 @@ public class Menu extends GameState {
 	public void click(MouseEvent event){
 		double y = event.getY();
 		if(page == 1) {
-			if(y > 150 && y < 250) {
+			if(y > 175 && y < 250) {
 				currSet = 0;
-			} else if (y > 250 && y < 350) {
+			} else if (y > 250 && y < 325) {
 				currSet = 1;
-			} else if (y > 350 && y < 450) {
+			} else if (y > 325 && y < 400) {
 				currSet = 2;
-			} else if (y > 450 && y < 550) {
+			} else if (y > 400 && y < 450) {
+				currSet = 3;
+			} else if(y > 450 && y < 550) {
 				page = 0;
 			}
 		} else if (page == 0) {
@@ -161,6 +167,7 @@ public class Menu extends GameState {
 			} else if (y > 250 && y < 350) {
 				page = 2;
 			} else if (y > 450 && y < 550) {
+				game.refreshCounter();
 				game.changeState(new Playing(game, keys, conductor));
 			}
 		} else if(page ==2) {
@@ -196,7 +203,7 @@ public class Menu extends GameState {
 			group.getChildren().add(nav[1].getText());
 			group.getChildren().add(nav[2].getText());
 		} else if(page == 1) {
-			for(int i=0;i<3;i++) {
+			for(int i=0;i<4;i++) {
 				group.getChildren().add(keySet[i].getText());
 			}
 			group.getChildren().add(nav[0].getText());

@@ -28,6 +28,8 @@ public class Main extends Application{
 	public ArrayList<Beat> beats;
 	GameState game;
 	
+	int counter = 0;
+	
 
 	public static void main(String[] args) {
 		Images.load();
@@ -81,7 +83,6 @@ public class Main extends Application{
 		);	
 		
 		AnimationTimer timer = new AnimationTimer() {
-			int counter = 0;
 			
 			public void handle(long currTime) {
 			
@@ -109,6 +110,9 @@ public class Main extends Application{
 		System.out.println("end");
 		stop();
 		Platform.exit();
+	}
+	public void refreshCounter() {
+		counter = 0;
 	}
 	
 

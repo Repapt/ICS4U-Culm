@@ -11,6 +11,7 @@ import beats.Beat;
 import beats.Conductor;
 import beats.DrumSound;
 import javafx.scene.Group;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -49,7 +50,7 @@ public class Playing extends GameState{
 	int streak = 0;
 	int mult = 1;
 	
-	double accuracy = 1;
+	double accuracy = 0;
 	int missed = 0;
 	int hits;
 	
@@ -57,9 +58,13 @@ public class Playing extends GameState{
 	int numBeats = 0;
 	
 	Text[] keys = new Text[3];
+	String[] keyString;
 	
 	long gameStart;
 	boolean started = false;
+	boolean paused = false;
+	boolean unpausing = false;
+	int unpauseCounter;
 	
 	Circle[] goals = new Circle[3];
 	
@@ -69,7 +74,15 @@ public class Playing extends GameState{
 	
 	ArrayList<Print> toPrint = new ArrayList<Print>();
 	Text scoreText;
+	
+	Text numDraw;
+	
+	Text[] startSeq = new Text[4];
+	
+	Rectangle pauseFilter;
+	Text pauseText;
 
+	DropShadow shadow;
 	
 	
 	public Playing(Main g, String[] keys, Conductor cond) {
@@ -77,7 +90,6 @@ public class Playing extends GameState{
 		super(g);
 		
 		game = g;
-		
 		
 		Print scoreText = new Print(50, 45, -1, Color.WHITE, "Score: " + score);
 		Print multText = new Print(25, 435, -1, Color.WHITE, "X1");
@@ -139,6 +151,7 @@ public class Playing extends GameState{
 			            new Stop(1, Color.web("#edb809")),
 			});
 	
+		keyString = new String[4];
 		
 		for(int i=0;i<3;i++) {
 			goals[i] = new Circle(100*(i+1), 500, 50, null);
@@ -148,7 +161,8 @@ public class Playing extends GameState{
 			
 			smallGoals[i] = new Circle(100*i + 100, 500, 25, grad2);
 			
-			this.keys[i] = new Text(keys[i]);
+			keyString[i] = keys[i];
+			this.keys[i] = new Text(keyString[i]);
 			this.keys[i].setBoundsType(TextBoundsType.VISUAL);
 			this.keys[i].setFill(Color.web("#3d0f5b", 0.2));
 			this.keys[i].setFont(Font.font("roberto", FontWeight.BOLD, 120));
@@ -159,7 +173,42 @@ public class Playing extends GameState{
 			beats[i] = new ArrayList<Beat>();
 			
 		}
+		pauseText = new Text("PAUSED");
+		pauseText.setBoundsType(TextBoundsType.VISUAL);
+		pauseText.setFill(Color.web("#002126"));
+		pauseText.setStroke(Color.web("#27c7eb"));
+		pauseText.setStrokeWidth(5);
+		pauseText.setFont(Font.font("roberto", FontWeight.BOLD, 100));
+		pauseText.setBoundsType(TextBoundsType.VISUAL);
+		pauseText.setX(200 -(pauseText.getBoundsInLocal().getWidth()/2));
+		pauseText.setY(400 - (pauseText.getBoundsInLocal().getHeight()/2));
+		pauseText.setEffect(shadow);
+		keyString[3] = keys[3];
 		
+		startSeq[0] = new Text("3");
+		startSeq[1] = new Text("2");
+		startSeq[2] = new Text("1");
+		startSeq[3] = new Text("GO!");
+		
+		shadow = new DropShadow();
+		shadow.setColor(Color.web("#002126"));
+		shadow.setSpread(0.5);
+		shadow.setRadius(30);
+		
+		for(int i=0;i<4;i++) {
+			startSeq[i].setFill(Color.web("#002126"));
+			startSeq[i].setStroke(Color.web("#27c7eb"));
+			startSeq[i].setStrokeWidth(5);
+			startSeq[i].setFont(Font.font("roberto", FontWeight.BOLD, 200));
+			startSeq[i].setBoundsType(TextBoundsType.VISUAL);
+			startSeq[i].setX(200 -(startSeq[i].getBoundsInLocal().getWidth()/2));
+			startSeq[i].setY(400 - (startSeq[i].getBoundsInLocal().getHeight()/2));
+			startSeq[i].setEffect(shadow);
+		}
+		
+		numDraw = startSeq[0];
+		
+		pauseFilter = new Rectangle(width, height, Color.web("#614b70", 0.5));
 		
 		background = new Rectangle(width, height, grad1);
 		
@@ -193,13 +242,6 @@ public class Playing extends GameState{
 		}
 		
 		
-		
-		try {
-			startAnim();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 	
 		
 	}
@@ -208,57 +250,59 @@ public class Playing extends GameState{
 		
 		complete.setWidth(width * (conductor.songPosition()/conductor.songLength()));
 		
-		if(System.nanoTime() - gameStart > conductor.getDelay()*1000000000 && !started) {
+		if(!started) {
+			
 			try {
-			conductor.play();
-			} catch(Exception e) {
+				startAnim(counter);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			started = true;
-		}
-		
-		if(started) {
-			if(conductor.update() == 1) {
 			
+		} else if(paused) {
+			pauseUpdate();
+		} else {
+		
+			genBeats();
+			if(missed + hits == 0) {
+				accuracy = 0;
+			} else {
+				accuracy = ((double)(hits))/((missed + hits));
+			}
+			
+			
+			toPrint.get(0).setText("Score: " + score);
+			toPrint.get(1).setText("X" + mult);
+			toPrint.get(2).setText("" + streak);
+			toPrint.get(3).setText(String.format("%.0f", accuracy*100)+ "%");
+		
+			if (streak > 31) {
+				mult = 8;
+				goldMode();
+			} else if(streak > 15) {
+				mult = 4;
+			} else if(streak > 7) {
+				mult = 2;
+			} 
+			
+			for(int i=0;i<drums.size();i++) {
+				if(drums.get(0).isEnded()) {
+					drums.remove(0);
+				}
+			}
+			
+			if(conductor.update() == 1) {
+				
 				try {
 					game.changeState(new Menu(game));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-		}
-		
-		genBeats();
-		if(missed + hits == 0) {
-			accuracy = 0;
-		} else {
-			accuracy = ((double)(hits))/((missed + hits));
-		}
-		
-		
-		toPrint.get(0).setText("Score: " + score);
-		toPrint.get(1).setText("X" + mult);
-		toPrint.get(2).setText("" + streak);
-		toPrint.get(3).setText(String.format("%.0f", accuracy*100)+ "%");
-	
-		if (streak > 31) {
-			mult = 8;
-			goldMode();
-		} else if(streak > 15) {
-			mult = 4;
-		} else if(streak > 7) {
-			mult = 2;
-		} 
-		
-		for(int i=0;i<drums.size();i++) {
-			if(drums.get(0).isEnded()) {
-				drums.remove(0);
-			}
+			
 		}
 		
 		
 		
-		//System.out.println(conductor.songPosition());
 		
 	}
 	public void draw(Group group) {
@@ -292,11 +336,13 @@ public class Playing extends GameState{
 			ArrayList<Beat> curr = beats[i];
 			for(int j=0;j<curr.size();j++) {
 				Beat currBeat = curr.get(j);
-				if(currBeat.getY() > 490 && currBeat.getY() < 510) {
-					
-					currBeat.move(false);
-				} else {
-					currBeat.move(true);
+				if(!paused) {
+					if(currBeat.getY() > 490 && currBeat.getY() < 510) {
+						
+						currBeat.move(false);
+					} else {
+						currBeat.move(true);
+					}
 				}
 				
 				group.getChildren().add(currBeat.circle);
@@ -321,6 +367,12 @@ public class Playing extends GameState{
 				group.getChildren().add(curr.getText());
 			}
 		}
+		if(!started || paused) {
+			group.getChildren().add(pauseFilter);
+			
+			group.getChildren().add(numDraw);
+			
+		}
 		
 		
 		
@@ -342,49 +394,57 @@ public class Playing extends GameState{
 			checkHit(1);
 		} else if (key.equals(keys[2].getText())) {
 			checkHit(2);
-			
+		} else if (key.equals(keyString[3])) {
+			if(paused) {
+				unpausing = true;
+				unpauseCounter = 0;
+			} else {
+				paused = true;
+			}
 		}
 	}
 	
 	private void checkHit(int lane) {
-		int len = beats[lane].size();
-		
-		drums.add(new DrumSound(conductor.getBeatVol()));
-		flashes.add(new Flash(lane, streak));
-
-
-		if(len == 0) {
-			miss();
-			toPrint.add(new Print(100*(lane+1), 440, 10, Color.RED, "miss"));
-		} else {
+		if(!paused) {
+			int len = beats[lane].size();
 			
-			Beat curr = beats[lane].get(0);
-			double y = curr.getY();
-			
-			for(int i=0;i<len;i++) {
-				curr = beats[lane].get(i);
-				y = curr.getY();
-				if(!(curr.getY() > 590)) {
-					break;
-				}
-			}
-			if(y < 560 && y > 440) {
-				
-				if(y < 510 && y > 490) {
-					score += 100*mult;
-					toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, gradPerf, "perfect!"));
-
-				} else {
-					score += 50*mult;
-					toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.GREEN, "good!"));
-
-				}
-				beats[lane].remove(0);
-				streak ++;
-				hits ++;
-			} else {
+			drums.add(new DrumSound(conductor.getBeatVol()));
+			flashes.add(new Flash(lane, streak));
+	
+	
+			if(len == 0) {
 				miss();
 				toPrint.add(new Print(100*(lane+1), 440, 10, Color.RED, "miss"));
+			} else {
+				
+				Beat curr = beats[lane].get(0);
+				double y = curr.getY();
+				
+				for(int i=0;i<len;i++) {
+					curr = beats[lane].get(i);
+					y = curr.getY();
+					if(!(curr.getY() > 590)) {
+						break;
+					}
+				}
+				if(y < 560 && y > 440) {
+					
+					if(y < 510 && y > 490) {
+						score += 100*mult;
+						toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, gradPerf, "perfect!"));
+	
+					} else {
+						score += 50*mult;
+						toPrint.add(new Print(curr.getX()-40, curr.getY()-25, 15, Color.GREEN, "good!"));
+	
+					}
+					beats[lane].remove(0);
+					streak ++;
+					hits ++;
+				} else {
+					miss();
+					toPrint.add(new Print(100*(lane+1), 440, 10, Color.RED, "miss"));
+				}
 			}
 		}
 	}
@@ -499,26 +559,50 @@ public class Playing extends GameState{
 	}
 	
 	
-	public void startAnim() throws Exception {
-		/*
-		long start = System.nanoTime();
-		TimeUnit.SECONDS.sleep(1);
-		long end = System.nanoTime();
-		System.out.println(end - start);
-		
-		start = System.nanoTime();
-		TimeUnit.SECONDS.sleep(1);
-		end = System.nanoTime();
-		System.out.println(end - start);
-		
-		start = System.nanoTime();
-		TimeUnit.SECONDS.sleep(1);
-		end = System.nanoTime();
-		System.out.println(end - start);
-		*/
+	public void startAnim(int counter) throws Exception {
+		if(counter < 60) {
+			numDraw = startSeq[0];
+		} else if (counter == 60) {
+			numDraw = startSeq[1];
+		} else if (counter == 120) {
+			numDraw = startSeq[2];
+		} else if (counter == 180) {
+			numDraw = startSeq[3];
+		} else if(counter > 240) {
+			try {
+				conductor.play();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			started = true;
+		}
 		
 		gameStart = System.nanoTime();
 
+	}
+	public void pauseUpdate() {
+		if(unpauseCounter == 0) {
+			conductor.pause();
+			numDraw = pauseText;
+		}
+		if(unpausing) {
+			
+			unpauseCounter ++;
+			if(unpauseCounter < 60) {
+				numDraw = startSeq[0];
+			} else if (unpauseCounter == 60) {
+				numDraw = startSeq[1];
+			} else if(unpauseCounter == 120) {
+				numDraw = startSeq[2];
+			} else if (unpauseCounter == 180) {
+				numDraw = startSeq[3];
+			} else if (unpauseCounter > 239) {
+				unpausing = false;
+				paused = false;
+				unpauseCounter = 0;
+				conductor.unpause();
+			}
+		}
 	}
 }
 
