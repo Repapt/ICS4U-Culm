@@ -49,13 +49,13 @@ public class Menu extends GameState {
 	
 	String[] keys = new String[4];
 	
-	Print[] keySet = new Print[4];
+	Text[] keySet = new Text[4];
 	
 	Text[] nav = new Text[3];
 	
 	Print[] songNames;
 	
-	Rectangle[] buttons;
+	Rectangle[] buttons, keyButtons;
 	
 	ArrayList<Dash> lines = new ArrayList<Dash>();
 	
@@ -95,10 +95,14 @@ public class Menu extends GameState {
 		shadow.setColor(Color.web("49a0be"));
 		
 		buttons = new Rectangle[3];
+		keyButtons = new Rectangle[4];
+		
+		nav[0].setY(325);
+		nav[1].setY(400);
+		nav[2].setY(525);
 		
 		for(int i=0;i<3;i++) {
 			nav[i].setFont(Images.font2);
-			nav[i].setY(325 + 100*i);
 			nav[i].setFill(highlight);
 			//nav[i].setBoundsType(TextBoundsType.VISUAL);
 			nav[i].setX(200 - nav[i].getBoundsInLocal().getWidth()/2);
@@ -108,22 +112,39 @@ public class Menu extends GameState {
 			
 			buttons[i] = new Rectangle(nav[i].getBoundsInLocal().getWidth()*1.2,nav[i].getBoundsInLocal().getHeight()*1.2,highlight);
 			buttons[i].setX(200 - buttons[i].getWidth()/2);
-			buttons[i].setY(325 + 100*i -buttons[i].getHeight() + nav[i].getBoundsInLocal().getHeight()/2);
+			buttons[i].setY(nav[i].getY() -buttons[i].getHeight() + nav[i].getBoundsInLocal().getHeight()/2);
 			buttons[i].setStroke(Color.web("49a0be"));
 			buttons[i].setStrokeWidth(1);
 			buttons[i].setEffect(shadow);
 			buttons[i].setOpacity(0);
 			
 		}
-		
-		
-		
-		
-		for(int i=0;i<3;i++) {
-			keySet[i] = new Print(40, 75*(i+3), -1, Color.WHITE, "Lane 1: " + keys[i]);
+		keySet[0] = new Text("Lane 1: " + keys[0]);
+		keySet[1] = new Text("Lane 2: " + keys[0]);
+		keySet[2] = new Text("Lane 3: " + keys[0]);
+		keySet[3] = new Text("Pause: " + keys[0]);
+		for(int i=0;i<4;i++) {
+
+			keySet[i].setFont(Images.font2);
+			keySet[i].setX(60);
+			keySet[i].setY(70*(i+3) + 40);
+			keySet[i].setFill(highlight);
+			keySet[i].setStroke(Color.web("49a0be"));
+			keySet[i].setStrokeWidth(1);
+			keySet[i].setEffect(shadow);
+			
+			keyButtons[i] = new Rectangle(keySet[i].getBoundsInLocal().getWidth()*1.2,keySet[i].getBoundsInLocal().getHeight()*1.2,highlight);
+			keyButtons[i].setX(60 + keySet[i].getBoundsInLocal().getWidth()/2 - keyButtons[i].getWidth()/2);
+			keyButtons[i].setY(70*(i+3) + 40 -keyButtons[i].getHeight() + keySet[i].getBoundsInLocal().getHeight()/2);
+			keyButtons[i].setStroke(Color.web("49a0be"));
+			keyButtons[i].setStrokeWidth(1);
+			keyButtons[i].setEffect(shadow);
+			keyButtons[i].setOpacity(0);
 		}
-		keySet[3] = new Print(40, 75*6, -1, Color.WHITE, "Pause: " + keys[3]);
-		Color thing = Color.web("#7b0b7c");
+		
+		
+		//keySet[3] = new Print(40, 75*6, -1, Color.WHITE, "Pause: " + keys[3]);
+		Color thing = Color.web("#5e055f");
 		backGrad = new LinearGradient(1, 1, 1, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[] {
 				new Stop(gradStops[0], thing),
@@ -191,15 +212,15 @@ public class Menu extends GameState {
 	public void click(MouseEvent event){
 		double y = event.getY();
 		if(page == 1) {
-			if(y > 175 && y < 250) {
+			if(y > keyButtons[0].getY() && y < keyButtons[0].getY() + keyButtons[0].getHeight()) {
 				currSet = 0;
-			} else if (y > 250 && y < 325) {
+			} else if (y > keyButtons[1].getY() && y < keyButtons[1].getY() + keyButtons[1].getHeight()) {
 				currSet = 1;
-			} else if (y > 325 && y < 400) {
+			} else if (y > keyButtons[2].getY() && y < keyButtons[2].getY() + keyButtons[2].getHeight()) {
 				currSet = 2;
-			} else if (y > 400 && y < 450) {
+			} else if (y > keyButtons[3].getY() && y < keyButtons[3].getY() + keyButtons[3].getHeight()) {
 				currSet = 3;
-			} else if(y > 450 && y < 550) {
+			} else if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
 				page = 0;
 				mouseReset();
 			}
@@ -248,17 +269,25 @@ public class Menu extends GameState {
 		mouseReset();
 		if(page == 0) {
 			if(y > buttons[0].getY() && y < buttons[0].getY() + buttons[0].getHeight()) {
-				mousedOver(0);
+				mousedOver(page, 0);
 			} else if(y > buttons[1].getY() && y < buttons[1].getY() + buttons[1].getHeight()) {
-				mousedOver(1);
+				mousedOver(page, 1);
 			}
 		} else if(page == 1) {
 			if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
-				mousedOver(2);
+				mousedOver(page, 2);
+			} else if(y > keyButtons[0].getY() && y < keyButtons[0].getY() + keyButtons[0].getHeight()) {
+				mousedOver(page, 3);
+			} else if(y > keyButtons[1].getY() && y < keyButtons[1].getY() + keyButtons[1].getHeight()) {
+				mousedOver(page, 4);
+			} else if(y > keyButtons[2].getY() && y < keyButtons[2].getY() + keyButtons[2].getHeight()) {
+				mousedOver(page, 5);
+			} else if(y > keyButtons[3].getY() && y < keyButtons[3].getY() + keyButtons[3].getHeight()) {
+				mousedOver(page, 6);
 			}
 		} else {
 			if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
-				mousedOver(2);
+				mousedOver(page, 2);
 			}
 		}
 	}
@@ -276,17 +305,20 @@ public class Menu extends GameState {
 		for(int i=0;i<lines.size();i++) {
 			group.getChildren().add(lines.get(i).getRect());
 		}
-
-		for(int i=0;i<3;i++) {
-			group.getChildren().add(buttons[i]);
-		}
+		
+		group.getChildren().add(buttons[2]);
 		
 		if(page == 0) {
+
+			group.getChildren().add(buttons[0]);
+			group.getChildren().add(buttons[1]);
+			
 			group.getChildren().add(nav[0]);
 			group.getChildren().add(nav[1]);
 		} else if(page == 1) {
 			for(int i=0;i<4;i++) {
-				group.getChildren().add(keySet[i].getText());
+				group.getChildren().add(keyButtons[i]);
+				group.getChildren().add(keySet[i]);
 			}
 			group.getChildren().add(nav[2]);
 		} else if (page == 2) {
@@ -305,11 +337,34 @@ public class Menu extends GameState {
 		
 	}
 	
-	public void mousedOver(int num) {
-		nav[num].setFill(Color.web("013b53"));
-		nav[num].setEffect(null);
-		nav[num].setStrokeWidth(0);
-		buttons[num].setOpacity(1);
+	public void mousedOver(int page, int num) {
+		if(page == 0) {
+			nav[num].setFill(Color.web("013b53"));
+			nav[num].setEffect(null);
+			nav[num].setStrokeWidth(0);
+			buttons[num].setOpacity(1);
+		} else if (page == 1) {
+			if(num == 2) {
+				nav[num].setFill(Color.web("013b53"));
+				nav[num].setEffect(null);
+				nav[num].setStrokeWidth(0);
+				buttons[num].setOpacity(1);
+			} else {
+				keySet[num - 3].setFill(Color.web("013b53"));
+				keySet[num - 3].setEffect(null);
+				keySet[num - 3].setStrokeWidth(0);
+				keyButtons[num - 3].setOpacity(1);
+				
+			}
+			
+		} else if (page == 2) {
+			if(num == 2) {
+				nav[num].setFill(Color.web("013b53"));
+				nav[num].setEffect(null);
+				nav[num].setStrokeWidth(0);
+				buttons[num].setOpacity(1);
+			}
+		}
 	}
 	
 	public void mouseReset() {
@@ -321,6 +376,15 @@ public class Menu extends GameState {
 
 			nav[i].setFill(highlight);
 			buttons[i].setOpacity(0);
+		}
+		
+		for(int i=0;i<4;i++) {
+			keySet[i].setStroke(Color.web("49a0be"));
+			keySet[i].setStrokeWidth(1);
+			keySet[i].setEffect(shadow);
+
+			keySet[i].setFill(highlight);
+			keyButtons[i].setOpacity(0);
 		}
 	}
 
