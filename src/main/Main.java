@@ -82,6 +82,14 @@ public class Main extends Application{
 		}
 		);	
 		
+		scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent event) {
+				if(game instanceof Menu) {
+					game.moved(event);
+				}
+			}
+		});
+		
 		AnimationTimer timer = new AnimationTimer() {
 			
 			public void handle(long currTime) {

@@ -94,7 +94,7 @@ public class Playing extends GameState{
 		Print scoreText = new Print(50, 45, -1, Color.WHITE, "Score: " + score);
 		Print multText = new Print(25, 435, -1, Color.WHITE, "X1");
 		Print streakText = new Print(25, 465, -1, Color.WHITE, "" + streak);
-		Print accText = new Print(315, 450, -1, Color.WHITE, "100%");
+		Print accText = new Print(305, 450, -1, Color.WHITE, "0%");
 		toPrint.add(scoreText);
 		toPrint.add(multText);
 		toPrint.add(streakText);
@@ -555,6 +555,10 @@ public class Playing extends GameState{
 		}
 		*/
 		
+		
+	}
+	
+	public void colorText(Text text) {
 		
 	}
 	

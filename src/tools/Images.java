@@ -12,16 +12,22 @@ public class Images {
 	public static Image title;
 	public static ImageView titleV;
 	
-	public static InputStream fontStream;
-	public static Font font;
+	public static InputStream fontStream, fontStream2;
+	public static Font font, font2;
 	
 
 	public static void load() {
+
+		fontStream = Images.class.getResourceAsStream("Prototype.ttf");
+
+		fontStream2 = Images.class.getResourceAsStream("Prototype.ttf");
 		
-		fontStream = Images.class.getResourceAsStream("TRON.TTF");
-		font = Font.loadFont(fontStream, 30);
+
+		font2 = Font.loadFont(fontStream2, 30);
+		font = Font.loadFont(fontStream, 40);
 		
-		title = new Image(Images.class.getResourceAsStream("Impulse.png"));
+		title = new Image(Images.class.getResourceAsStream("Impulse3.png"));
 		titleV = new ImageView(title);
 	}
+	
 }

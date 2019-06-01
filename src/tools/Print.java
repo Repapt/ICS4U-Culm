@@ -5,6 +5,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 
 public class Print {
 
@@ -19,8 +20,8 @@ public class Print {
 		text.setFill(color);
 		text.setX(x);
 		text.setY(y);
-		text.setFont(Font.font("roberto", FontWeight.BOLD, 30));
-		//text.setFont(Images.font);
+		//text.setFont(Font.font("roberto", FontWeight.BOLD, 30));
+		text.setFont(Images.font);
 		this.dur = dur;
 		
 	}
@@ -42,6 +43,10 @@ public class Print {
 	
 	public void setText(String toSet) {
 		text.setText(toSet);
+	}
+	public void center(double mid) {
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setX(mid - text.getBoundsInLocal().getWidth()/2);
 	}
 	
 }
