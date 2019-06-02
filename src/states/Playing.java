@@ -30,6 +30,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
 import main.Main;
 import tools.Flash;
+import tools.Images;
 import tools.LoadMidi;
 import tools.Print;
 
@@ -83,6 +84,13 @@ public class Playing extends GameState{
 	Text pauseText;
 
 	DropShadow shadow;
+	
+	Rectangle quitButton;
+	Rectangle optionBack;
+	Rectangle[] slideBars = new Rectangle[2];
+	Rectangle[] emptySlideBars = new Rectangle[2];
+	Rectangle[] sliders = new Rectangle[2];
+	Text[] pauseOptions = new Text[3];
 	
 	
 	public Playing(Main g, String[] keys, Conductor cond) {
@@ -152,6 +160,33 @@ public class Playing extends GameState{
 			});
 	
 		keyString = new String[4];
+	
+		pauseText = new Text("PAUSED");
+		startSeq[0] = new Text("3");
+		startSeq[1] = new Text("2");
+		startSeq[2] = new Text("1");
+		startSeq[3] = new Text("GO!");
+
+		pauseText.setFont(Images.font3);
+		colorText(pauseText);
+		pauseText.setY(pauseText.getY() - 150);
+		
+		for(int i=0;i<4;i++) {
+			keyString[i] = keys[i];
+			startSeq[i].setFont(Images.font4);
+			colorText(startSeq[i]);
+		}
+		
+		numDraw = startSeq[0];
+		
+		optionBack = new Rectangle(300, 225, Color.web("#4e2a66", 0.8));
+		optionBack.setX(50);
+		optionBack.setY(250);
+		optionBack.setStroke(Color.web("#3c1951", 0.8));
+		optionBack.setStrokeWidth(5);
+		pauseOptions[0] = new Text("Music");
+		pauseOptions[1] = new Text("Beats");
+		pauseOptions[2] = new Text("Quit");
 		
 		for(int i=0;i<3;i++) {
 			goals[i] = new Circle(100*(i+1), 500, 50, null);
@@ -161,7 +196,7 @@ public class Playing extends GameState{
 			
 			smallGoals[i] = new Circle(100*i + 100, 500, 25, grad2);
 			
-			keyString[i] = keys[i];
+			
 			this.keys[i] = new Text(keyString[i]);
 			this.keys[i].setBoundsType(TextBoundsType.VISUAL);
 			this.keys[i].setFill(Color.web("#3d0f5b", 0.2));
@@ -172,43 +207,38 @@ public class Playing extends GameState{
 			
 			beats[i] = new ArrayList<Beat>();
 			
+			pauseOptions[i].setFont(Images.font2);
+			pauseOptions[i].setX(75);
+			pauseOptions[i].setStroke(Color.web("49a0be"));
+			pauseOptions[i].setFill(Color.web("b5d9e0"));
+			pauseOptions[i].setStrokeWidth(1);
+			pauseOptions[i].setEffect(shadow);
+			pauseOptions[i].setY(300 + (i*75));
+			
 		}
-		pauseText = new Text("PAUSED");
-		pauseText.setBoundsType(TextBoundsType.VISUAL);
-		pauseText.setFill(Color.web("#002126"));
-		pauseText.setStroke(Color.web("#27c7eb"));
-		pauseText.setStrokeWidth(5);
-		pauseText.setFont(Font.font("roberto", FontWeight.BOLD, 100));
-		pauseText.setBoundsType(TextBoundsType.VISUAL);
-		pauseText.setX(200 -(pauseText.getBoundsInLocal().getWidth()/2));
-		pauseText.setY(400 - (pauseText.getBoundsInLocal().getHeight()/2));
-		pauseText.setEffect(shadow);
-		keyString[3] = keys[3];
-		
-		startSeq[0] = new Text("3");
-		startSeq[1] = new Text("2");
-		startSeq[2] = new Text("1");
-		startSeq[3] = new Text("GO!");
-		
-		shadow = new DropShadow();
-		shadow.setColor(Color.web("#002126"));
-		shadow.setSpread(0.5);
-		shadow.setRadius(30);
-		
-		for(int i=0;i<4;i++) {
-			startSeq[i].setFill(Color.web("#002126"));
-			startSeq[i].setStroke(Color.web("#27c7eb"));
-			startSeq[i].setStrokeWidth(5);
-			startSeq[i].setFont(Font.font("roberto", FontWeight.BOLD, 200));
-			startSeq[i].setBoundsType(TextBoundsType.VISUAL);
-			startSeq[i].setX(200 -(startSeq[i].getBoundsInLocal().getWidth()/2));
-			startSeq[i].setY(400 - (startSeq[i].getBoundsInLocal().getHeight()/2));
-			startSeq[i].setEffect(shadow);
+		pauseOptions[2].setX(200 - pauseOptions[2].getBoundsInLocal().getWidth()/2);
+
+		for(int i=0;i<2;i++) {
+			slideBars[i] = new Rectangle(150, 5, gradGoal);
+			slideBars[i].setX(165);
+			slideBars[i].setY(290 + (i*75));
+			emptySlideBars[i] = new Rectangle(150, 5, Color.web("#3e324c"));
+			emptySlideBars[i].setX(165);
+			emptySlideBars[i].setY(290 + (i*75));
+			emptySlideBars[i].setStrokeType(StrokeType.INSIDE);
+			emptySlideBars[i].setStroke(gradGoal);
 		}
 		
-		numDraw = startSeq[0];
 		
-		pauseFilter = new Rectangle(width, height, Color.web("#614b70", 0.5));
+		quitButton = new Rectangle(pauseOptions[2].getBoundsInLocal().getWidth()*1.2,pauseOptions[2].getBoundsInLocal().getHeight(),Color.web("b5d9e0"));
+		quitButton.setX(200 - quitButton.getWidth()/2);
+		quitButton.setY(pauseOptions[2].getY() -quitButton.getHeight() + pauseOptions[2].getBoundsInLocal().getHeight()/2 - 10);
+		quitButton.setStroke(Color.web("49a0be"));
+		quitButton.setStrokeWidth(1);
+		quitButton.setEffect(shadow);
+		quitButton.setOpacity(0);
+		
+		pauseFilter = new Rectangle(width, height, Color.web("#553c66", 0.7));
 		
 		background = new Rectangle(width, height, grad1);
 		
@@ -249,6 +279,8 @@ public class Playing extends GameState{
 	public void update(int counter) {
 		
 		complete.setWidth(width * (conductor.songPosition()/conductor.songLength()));
+		slideBars[0].setWidth(150 * conductor.getSongVol());
+		slideBars[1].setWidth(150 * conductor.getBeatVol());
 		
 		if(!started) {
 			
@@ -372,6 +404,18 @@ public class Playing extends GameState{
 			
 			group.getChildren().add(numDraw);
 			
+			if(paused) {
+				group.getChildren().add(optionBack);
+				group.getChildren().add(quitButton);
+				for(int i=0;i<3;i++) {
+					group.getChildren().add(pauseOptions[i]);
+					if(i<2) {
+						group.getChildren().add(emptySlideBars[i]);
+						group.getChildren().add(slideBars[i]);
+					}
+				}
+			}
+			
 		}
 		
 		
@@ -383,7 +427,33 @@ public class Playing extends GameState{
 		
 	}
 	public void click(MouseEvent event) {
-		
+		double x = event.getX();
+		double y = event.getY();
+		if(paused) {
+			if(y > quitButton.getY() && y < quitButton.getY() + quitButton.getHeight()) {
+				if(x > quitButton.getX() && x < quitButton.getX() + quitButton.getWidth()) {
+					try {
+						game.changeState(new Menu(game));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} else if(y > emptySlideBars[0].getY() && y < emptySlideBars[0].getY() + emptySlideBars[0].getHeight()) {
+				if(x > emptySlideBars[0].getX() && x < emptySlideBars[0].getX() + emptySlideBars[0].getWidth()) {
+					double newVol = (x-emptySlideBars[0].getX())/150;
+					conductor.setSongVol(newVol);
+					slideBars[0].setWidth(newVol*150);
+				}
+			}else if(y > emptySlideBars[1].getY() && y < emptySlideBars[1].getY() + emptySlideBars[1].getHeight()) {
+				if(x > emptySlideBars[1].getX() && x < emptySlideBars[1].getX() + emptySlideBars[1].getWidth()) {
+					double newVol = (x-emptySlideBars[1].getX())/150;
+					conductor.setBeatVol(newVol);
+					slideBars[1].setWidth(newVol*150);
+				}
+			}
+			
+		}
 	}
 	
 	public void keyPress(KeyEvent event) {
@@ -400,6 +470,25 @@ public class Playing extends GameState{
 				unpauseCounter = 0;
 			} else {
 				paused = true;
+			}
+		}
+	}
+	
+	public void moved(MouseEvent event) {
+		double x = event.getX();
+		double y = event.getY();
+		if(paused) {
+			pauseOptions[2].setFill(Color.web("b5d9e0"));
+			pauseOptions[2].setStrokeWidth(1);
+			pauseOptions[2].setEffect(shadow);
+			quitButton.setOpacity(0);
+			if(y > quitButton.getY() && y < quitButton.getY() + quitButton.getHeight()) {
+				if(x > quitButton.getX() && x < quitButton.getX() + quitButton.getWidth()) {
+					pauseOptions[2].setFill(Color.web("013b53"));
+					pauseOptions[2].setEffect(null);
+					pauseOptions[2].setStrokeWidth(0);
+					quitButton.setOpacity(1);
+				}
 			}
 		}
 	}
@@ -451,7 +540,6 @@ public class Playing extends GameState{
 	
 	public void miss() {
 		missed ++;
-		score -= 100;
 		purpleMode();
 		streak = 0;
 		mult = 1;
@@ -557,9 +645,21 @@ public class Playing extends GameState{
 		
 		
 	}
-	
 	public void colorText(Text text) {
 		
+		shadow = new DropShadow();
+		shadow.setColor(Color.web("b5d9e0"));
+		//shadow.setSpread(0.5);
+		shadow.setRadius(10);
+		
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setFill(Color.web("013b53"));
+		text.setStroke(Color.web("b5d9e0"));
+		text.setStrokeWidth(5);
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setX(200 -(text.getBoundsInLocal().getWidth()/2));
+		text.setY(400 - (text.getBoundsInLocal().getHeight()/2));
+		text.setEffect(shadow);
 	}
 	
 	

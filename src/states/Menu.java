@@ -126,7 +126,7 @@ public class Menu extends GameState {
 		for(int i=0;i<4;i++) {
 
 			keySet[i].setFont(Images.font2);
-			keySet[i].setX(60);
+			keySet[i].setX(100);
 			keySet[i].setY(70*(i+3) + 40);
 			keySet[i].setFill(highlight);
 			keySet[i].setStroke(Color.web("49a0be"));
@@ -134,7 +134,7 @@ public class Menu extends GameState {
 			keySet[i].setEffect(shadow);
 			
 			keyButtons[i] = new Rectangle(keySet[i].getBoundsInLocal().getWidth()*1.2,keySet[i].getBoundsInLocal().getHeight()*1.2,highlight);
-			keyButtons[i].setX(60 + keySet[i].getBoundsInLocal().getWidth()/2 - keyButtons[i].getWidth()/2);
+			keyButtons[i].setX(100 + keySet[i].getBoundsInLocal().getWidth()/2 - keyButtons[i].getWidth()/2);
 			keyButtons[i].setY(70*(i+3) + 40 -keyButtons[i].getHeight() + keySet[i].getBoundsInLocal().getHeight()/2);
 			keyButtons[i].setStroke(Color.web("49a0be"));
 			keyButtons[i].setStrokeWidth(1);
@@ -144,7 +144,7 @@ public class Menu extends GameState {
 		
 		
 		//keySet[3] = new Print(40, 75*6, -1, Color.WHITE, "Pause: " + keys[3]);
-		Color thing = Color.web("#5e055f");
+		Color thing = Color.web("#370138");
 		backGrad = new LinearGradient(1, 1, 1, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[] {
 				new Stop(gradStops[0], thing),

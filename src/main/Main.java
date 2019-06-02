@@ -84,9 +84,8 @@ public class Main extends Application{
 		
 		scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent event) {
-				if(game instanceof Menu) {
-					game.moved(event);
-				}
+				game.moved(event);
+				
 			}
 		});
 		

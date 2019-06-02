@@ -138,6 +138,10 @@ public class Conductor {
 		return increment;
 	}
 	
+	public double getSongVol() {
+		return player.getVolume();
+	}
+	
 	
 	public double songLength() {
 		return player.getTotalDuration().toSeconds();
@@ -169,6 +173,12 @@ public class Conductor {
 	public void unpause() {
 		prevFrame = System.nanoTime()/1000000000.0;
 		player.play();
+	}
+	public void setBeatVol(double vol) {
+		beatVol[songNum] = vol;
+	}
+	public void setSongVol(double vol) {
+		player.setVolume(vol);
 	}
 	
 	
