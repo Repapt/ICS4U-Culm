@@ -6,14 +6,12 @@ import beats.Beat;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import states.*;
@@ -53,7 +51,6 @@ public class Main extends Application{
 		
 		game = new Menu(this);
 		
-		
 		Scene scene = new Scene(root, width, height, Color.BLACK);
 		
 		scene.addEventFilter(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>(){
@@ -88,6 +85,21 @@ public class Main extends Application{
 				
 			}
 		});
+		
+		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent event) {
+				//System.out.println(event.getX() + ", " + event.getY());
+				game.dragged(event);
+			}
+		});
+		
+		scene.setOnMouseReleased(new EventHandler <MouseEvent>(){
+			public void handle(MouseEvent event) {
+				game.mouseRelease(event);
+			}
+		});
+		
+		
 		
 		AnimationTimer timer = new AnimationTimer() {
 			

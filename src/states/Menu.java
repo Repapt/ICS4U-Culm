@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import beats.Conductor;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.media.Media;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -20,7 +18,6 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import main.Main;
-import tools.Flash;
 import tools.Images;
 import tools.Dash;
 import tools.Print;
@@ -156,6 +153,7 @@ public class Menu extends GameState {
 				
 		background = new Rectangle(width, height*3, backGrad);
 		
+		
 		numSongs = conductor.getSongList().length;
 		songNames = new Print[numSongs];
 		
@@ -200,12 +198,15 @@ public class Menu extends GameState {
 
 	@Override
 	public void keyPress(KeyEvent event) {
-		
 		if(page == 1) {
 			keys[currSet] = event.getText().toUpperCase();
 		}
+	}
+	
+	public void dragged(MouseEvent event) {
 		
-		
+	}
+	public void mouseRelease(MouseEvent event) {
 		
 	}
 	

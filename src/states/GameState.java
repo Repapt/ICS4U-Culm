@@ -23,7 +23,9 @@ public abstract class GameState {
 	public abstract void keyPress(KeyEvent event);
 	public abstract void keyRelease(KeyEvent event);
 	public abstract void click(MouseEvent event);
-	public void moved(MouseEvent event) {}
+	public abstract void moved(MouseEvent event);
+	public abstract void dragged(MouseEvent event);
+	public abstract void mouseRelease(MouseEvent event);
 	
 	public abstract void draw(Group group);
 	
