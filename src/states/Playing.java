@@ -42,6 +42,10 @@ public class Playing extends GameState{
 	Rectangle background, lanes, backMult, backAcc, complete, total, inLines;
 	
 	LinearGradient grad1, grad2, gradGoal, gradGoal2, gradGoal22, gradPerf;
+	
+	double[] gradStops; 
+	double backY = 0;
+	
 	int score = 0;
 	int streak = 0;
 	int mult = 1;
@@ -70,11 +74,12 @@ public class Playing extends GameState{
 	Conductor conductor;
 	
 	ArrayList<Print> toPrint = new ArrayList<Print>();
-	Text scoreText;
 	
 	Text numDraw;
 	
 	Text[] startSeq = new Text[4];
+	
+	Text songName, artistName;
 	
 	Rectangle pauseFilter;
 	Text pauseText;
@@ -97,7 +102,20 @@ public class Playing extends GameState{
 		
 		game = g;
 		
-		Print scoreText = new Print(50, 45, -1, Color.WHITE, "Score: " + score);
+		songName = new Text(cond.getSongName());
+		songName.setX(50);
+		songName.setY(35);
+		songName.setFill(Color.WHITE);
+		songName.setFont(Images.font5);
+		
+		artistName = new Text(cond.getArtistName());
+		artistName.setX(50);
+		artistName.setY(15 + songName.getY());
+		artistName.setFill(Color.WHITE);
+		artistName.setFont(Images.superSmall);
+		
+		Print scoreText = new Print(50, 120, -1, Color.WHITE, "Score: " + score);
+		scoreText.center(200);
 		Print multText = new Print(25, 435, -1, Color.WHITE, "X1");
 		Print streakText = new Print(25, 465, -1, Color.WHITE, "" + streak);
 		Print accText = new Print(305, 450, -1, Color.WHITE, "0%");
@@ -106,12 +124,28 @@ public class Playing extends GameState{
 		toPrint.add(streakText);
 		toPrint.add(accText);
 		
+		gradStops = new double[5];
+		gradStops[0] = 0;
+		gradStops[1] = 0.25;
+		gradStops[2] = 0.5;
+		gradStops[3] = 0.8;
+		gradStops[4] = 1;
+		
 		grad1 = new LinearGradient(0f, 1f, 1f, 0f, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
-				            new Stop(0, Color.web("#64c2f8")),
-				            new Stop(0.57, Color.web("#be4af7")),
-				            new Stop(1, Color.web("#ed5fc2")),
+				            //new Stop(gradStops[0], Color.web("#64c2f8")),
+				            new Stop(gradStops[0], Color.web("5f89b7")),
+				            new Stop(gradStops[1], Color.web("#ed5fc2")),
+				            new Stop(gradStops[2], Color.web("#be4af7")),
+				           // new Stop(gradStops[2], Color.web ("#370138")),
+				       
+				            new Stop(gradStops[3], Color.web("ed5fc2")),
+				           // new Stop(gradStops[3], Color.web("#517399")),
+				            new Stop(gradStops[4], Color.web("#5f89b7")),
 				});
+		
+
+		background = new Rectangle(width, height*5, grad1);
 		
 		grad2 = new LinearGradient(1, 1, 0, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[]{
@@ -258,8 +292,6 @@ public class Playing extends GameState{
 		
 		pauseFilter = new Rectangle(width, height, Color.web("#553c66", 0.7));
 		
-		background = new Rectangle(width, height, grad1);
-		
 		backMult = new Rectangle(100, 75, Color.web("#3e324c", 0.8));
 		backMult.setY(400);
 		
@@ -301,7 +333,11 @@ public class Playing extends GameState{
 		slideBars[1].setWidth(150 * conductor.getBeatVol());
 		sliders[0].setX(slideBars[0].getX() + slideBars[0].getWidth() - sliders[0].getWidth()/2);
 		sliders[1].setX(slideBars[1].getX() + slideBars[1].getWidth() - sliders[0].getWidth()/2);
-
+		
+		backY += 0.005;
+		background.setY(1200*Math.sin(backY) - 1200);
+		//background.setY(backY);
+		
 		if(!started) {
 			
 			try {
@@ -419,6 +455,8 @@ public class Playing extends GameState{
 				group.getChildren().add(curr.getText());
 			}
 		}
+		group.getChildren().add(songName);
+		group.getChildren().add(artistName);
 		if(!started || paused) {
 			group.getChildren().add(pauseFilter);
 			
@@ -562,11 +600,13 @@ public class Playing extends GameState{
 		} else if (key.equals(keys[2].getText())) {
 			checkHit(2);
 		} else if (key.equals(keyString[3])) {
-			if(paused && !unpausing) {
-				unpausing = true;
-				unpauseCounter = 0;
-			} else {
-				paused = true;
+			if(started) {
+				if(paused && !unpausing) {
+					unpausing = true;
+					unpauseCounter = 0;
+				} else {
+					paused = true;
+				}
 			}
 		}
 	}
@@ -771,14 +811,18 @@ public class Playing extends GameState{
 	
 	
 	public void startAnim(int counter) throws Exception {
-		if(counter < 60) {
+		if(counter == 1) {
 			numDraw = startSeq[0];
+			drums.add(new DrumSound(conductor.getBeatVol()));
 		} else if (counter == 60) {
 			numDraw = startSeq[1];
+			drums.add(new DrumSound(conductor.getBeatVol()));
 		} else if (counter == 120) {
 			numDraw = startSeq[2];
+			drums.add(new DrumSound(conductor.getBeatVol()));
 		} else if (counter == 180) {
 			numDraw = startSeq[3];
+			drums.add(new DrumSound(conductor.getBeatVol()));
 		} else if(counter > 240) {
 			try {
 				conductor.play();
@@ -799,14 +843,18 @@ public class Playing extends GameState{
 		if(unpausing) {
 			
 			unpauseCounter ++;
-			if(unpauseCounter < 60) {
+			if(unpauseCounter == 1) {
 				numDraw = startSeq[0];
+				drums.add(new DrumSound(conductor.getBeatVol()));
 			} else if (unpauseCounter == 60) {
 				numDraw = startSeq[1];
+				drums.add(new DrumSound(conductor.getBeatVol()));
 			} else if(unpauseCounter == 120) {
 				numDraw = startSeq[2];
+				drums.add(new DrumSound(conductor.getBeatVol()));
 			} else if (unpauseCounter == 180) {
 				numDraw = startSeq[3];
+				drums.add(new DrumSound(conductor.getBeatVol()));
 			} else if (unpauseCounter > 239) {
 				unpausing = false;
 				paused = false;

@@ -50,9 +50,9 @@ public class Menu extends GameState {
 	
 	Text[] nav = new Text[3];
 	
-	Print[] songNames;
+	Text[] songNames, artists;
 	
-	Rectangle[] buttons, keyButtons;
+	Rectangle[] buttons, keyButtons, songButtons;
 	
 	ArrayList<Dash> lines = new ArrayList<Dash>();
 	
@@ -123,7 +123,7 @@ public class Menu extends GameState {
 		for(int i=0;i<4;i++) {
 
 			keySet[i].setFont(Images.font2);
-			keySet[i].setX(100);
+			keySet[i].setX(200 - keySet[i].getBoundsInLocal().getWidth()/2);
 			keySet[i].setY(70*(i+3) + 40);
 			keySet[i].setFill(highlight);
 			keySet[i].setStroke(Color.web("49a0be"));
@@ -131,7 +131,7 @@ public class Menu extends GameState {
 			keySet[i].setEffect(shadow);
 			
 			keyButtons[i] = new Rectangle(keySet[i].getBoundsInLocal().getWidth()*1.2,keySet[i].getBoundsInLocal().getHeight()*1.2,highlight);
-			keyButtons[i].setX(100 + keySet[i].getBoundsInLocal().getWidth()/2 - keyButtons[i].getWidth()/2);
+			keyButtons[i].setX(200 - keyButtons[i].getWidth()/2);
 			keyButtons[i].setY(70*(i+3) + 40 -keyButtons[i].getHeight() + keySet[i].getBoundsInLocal().getHeight()/2);
 			keyButtons[i].setStroke(Color.web("49a0be"));
 			keyButtons[i].setStrokeWidth(1);
@@ -155,11 +155,39 @@ public class Menu extends GameState {
 		
 		
 		numSongs = conductor.getSongList().length;
-		songNames = new Print[numSongs];
+		songNames = new Text[numSongs];
+		artists = new Text[numSongs];
+		songButtons = new Rectangle[numSongs];
 		
 		for(int i=0;i<numSongs; i++) {
 			String song = conductor.getSongList()[i];
-			songNames[i] = new Print(40, 75*(i+3), -1, Color.WHITE, song);
+			songNames[i] = new Text(song);
+			songNames[i].setFont(Images.font5);
+			songNames[i].setX(40);
+			songNames[i].setY(70*(i+3) + 40);
+			songNames[i].setFill(highlight);
+			songNames[i].setStroke(Color.web("49a0be"));
+			songNames[i].setStrokeWidth(1);
+			songNames[i].setEffect(shadow);
+			
+			artists[i] = new Text(conductor.getArtistList()[i]);
+			artists[i].setFont(Images.superSmall);
+			artists[i].setX(40);
+			artists[i].setY(70*(i+3) + songNames[i].getBoundsInLocal().getHeight() + 7);
+			artists[i].setFill(highlight);
+			artists[i].setStroke(Color.web("49a0be"));
+			artists[i].setStrokeWidth(0.5);
+			artists[i].setEffect(shadow);
+			
+			double buttonW = Math.max(songNames[i].getBoundsInLocal().getWidth()*1.1, artists[i].getBoundsInLocal().getWidth()*1.1);
+			
+			songButtons[i] = new Rectangle(buttonW,songNames[i].getBoundsInLocal().getHeight()*1.2,highlight);
+			songButtons[i].setX(30 + buttonW/2.2 - songButtons[i].getWidth()/2);
+			songButtons[i].setY(70*(i+3) + 40 + 7 -songButtons[i].getHeight() + songNames[i].getBoundsInLocal().getHeight()/2);
+			songButtons[i].setStroke(Color.web("49a0be"));
+			songButtons[i].setStrokeWidth(1);
+			songButtons[i].setEffect(shadow);
+			songButtons[i].setOpacity(0);
 		}
 	
 				
@@ -179,7 +207,7 @@ public class Menu extends GameState {
 		for(int i=0;i<lines.size();i++) {
 			Dash curr = lines.get(i);
 			curr.update();
-			if(curr.getX() > 400 || curr.getY() > 600 || curr.getY() < 0 || curr.getX() < 0) {
+			if(curr.getX() > 400 || curr.getY() > 600 || curr.getY() + curr.getHeight() < 0 || curr.getX() + curr.getWidth() < 0) {
 				lines.remove(i);
 			}
 		}
@@ -238,28 +266,22 @@ public class Menu extends GameState {
 			
 		} else if(page ==2) {
 			
-			if(y > 175 && y < 250) {
-				conductor.setSong(0);
-				game.refreshCounter();
-				game.changeState(new Playing(game, keys, conductor));
-			} else if (y > 250 && y < 325) {
-				conductor.setSong(1);
-				game.refreshCounter();
-				game.changeState(new Playing(game, keys, conductor));
-			} else if(y > 325 && y < 400){ 
-				conductor.setSong(2);
-				game.refreshCounter();
-				game.changeState(new Playing(game, keys, conductor));
-			} else if(y > 400 && y < 450) {
-				conductor.setSong(3);
-				game.refreshCounter();
-				game.changeState(new Playing(game, keys, conductor));
-			} else if (y > 450 && y < 550) {
+			if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
 				page = 0;
 				mouseReset();
-			} 
-			
-			System.out.println(conductor.getSongName());
+			} else {
+				for(int i=0;i<numSongs;i++) {
+					if(y > songButtons[i].getY() && y < songButtons[i].getY() + songButtons[i].getHeight()) {
+
+						conductor.setSong(i);
+						game.refreshCounter();
+						game.changeState(new Playing(game, keys, conductor));
+	
+						System.out.println(conductor.getSongName());
+						break;
+					} 
+				}
+			}
 			
 		}
 	}
@@ -276,7 +298,9 @@ public class Menu extends GameState {
 			}
 		} else if(page == 1) {
 			if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
-				mousedOver(page, 2);
+				if(x > buttons[2].getX() && x < buttons[2].getX() + buttons[2].getWidth()) {
+					mousedOver(page, 2);
+				}
 			} else if(y > keyButtons[0].getY() && y < keyButtons[0].getY() + keyButtons[0].getHeight()) {
 				mousedOver(page, 3);
 			} else if(y > keyButtons[1].getY() && y < keyButtons[1].getY() + keyButtons[1].getHeight()) {
@@ -288,7 +312,17 @@ public class Menu extends GameState {
 			}
 		} else {
 			if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
-				mousedOver(page, 2);
+				if(x > buttons[2].getX() && x < buttons[2].getX() + buttons[2].getWidth()) {
+					mousedOver(page, 2);
+				}
+			}else if(y > songButtons[0].getY() && y < songButtons[0].getY() + songButtons[0].getHeight()) {
+				mousedOver(page, 7);
+			} else if(y > songButtons[1].getY() && y < songButtons[1].getY() + songButtons[1].getHeight()) {
+				mousedOver(page, 8);
+			} else if(y > songButtons[2].getY() && y < songButtons[2].getY() + songButtons[2].getHeight()) {
+				mousedOver(page, 9);
+			} else if(y > songButtons[3].getY() && y < songButtons[3].getY() + songButtons[3].getHeight()) {
+				mousedOver(page, 10);
 			}
 		}
 	}
@@ -316,6 +350,7 @@ public class Menu extends GameState {
 			
 			group.getChildren().add(nav[0]);
 			group.getChildren().add(nav[1]);
+			
 		} else if(page == 1) {
 			for(int i=0;i<4;i++) {
 				group.getChildren().add(keyButtons[i]);
@@ -324,7 +359,9 @@ public class Menu extends GameState {
 			group.getChildren().add(nav[2]);
 		} else if (page == 2) {
 			for(int i=0;i<numSongs; i++) {
-				group.getChildren().add(songNames[i].getText());
+				group.getChildren().add(songButtons[i]);
+				group.getChildren().add(songNames[i]);
+				group.getChildren().add(artists[i]);
 			}
 			
 			group.getChildren().add(nav[2]);
@@ -364,6 +401,17 @@ public class Menu extends GameState {
 				nav[num].setEffect(null);
 				nav[num].setStrokeWidth(0);
 				buttons[num].setOpacity(1);
+			}else {
+				songNames[num - 7].setFill(Color.web("013b53"));
+				songNames[num - 7].setEffect(null);
+				songNames[num - 7].setStrokeWidth(0);
+				
+				artists[num - 7].setFill(Color.web("013b53"));
+				artists[num - 7].setEffect(null);
+				artists[num - 7].setStrokeWidth(0);
+				
+				songButtons[num - 7].setOpacity(1);
+				
 			}
 		}
 	}
@@ -387,6 +435,21 @@ public class Menu extends GameState {
 			keySet[i].setFill(highlight);
 			keyButtons[i].setOpacity(0);
 		}
+		
+		for(int i=0;i<numSongs;i++) {
+			songNames[i].setStroke(Color.web("49a0be"));
+			songNames[i].setStrokeWidth(1);
+			songNames[i].setEffect(shadow);
+			songNames[i].setFill(highlight);
+			
+			artists[i].setStroke(Color.web("49a0be"));
+			artists[i].setStrokeWidth(0.5);
+			artists[i].setEffect(shadow);
+			artists[i].setFill(highlight);
+			
+			songButtons[i].setOpacity(0);
+		}
+	
 	}
 
 }

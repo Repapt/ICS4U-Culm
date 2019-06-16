@@ -59,5 +59,11 @@ public class Dash {
 	public double getY() {
 		return line.getY();
 	}
+	public double getHeight() {
+		return line.getHeight();
+	}
+	public double getWidth() {
+		return line.getWidth();
+	}
 }
 

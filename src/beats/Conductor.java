@@ -22,8 +22,7 @@ public class Conductor {
 	Media[] songs = new Media[numSongs];
 	
 	String[] songNames = new String[numSongs];
-	
-	double[] delays = new double[numSongs];
+	String[] artists = new String[numSongs];
 
 	int songNum;
 	
@@ -44,15 +43,20 @@ public class Conductor {
 		bpm[2] = 170;
 		bpm[3] = 90;
 		
-		beatVol[0] = 0.15;
-		beatVol[1] = 0.07;
-		beatVol[2] = 0.3;
-		beatVol[3] = 0.15;
+		beatVol[0] = 0.3;
+		beatVol[1] = 0.14;
+		beatVol[2] = 0.6;
+		beatVol[3] = 0.3;
 		
 		songNames[0] = "Wilson (Expensive Mistakes)";
 		songNames[1] = "Happier";
 		songNames[2] = "Can't You See";
 		songNames[3] = "Sunflower";
+		
+		artists[0] = "Fall Out Boy";
+		artists[1] = "Marshmello ft. Bastille";
+		artists[2] = "FIDLAR";
+		artists[3] = "Post Malone & Swae Lee";
 		
 		for(int i=0;i<4;i++) {
 			songs[i] = new Media(getClass().getResource(songNames[i] + ".wav").toExternalForm());
@@ -106,16 +110,17 @@ public class Conductor {
 	public String getSongName() {
 		return songNames[songNum];
 	}
-	
+	public String[] getArtistList() {
+		return artists;
+	}
+	public String getArtistName() {
+		return artists[songNum];
+	}
 	public double getBeatVol() {
 		return beatVol[songNum];
 	}
 	public double getTravelTime() {
 		return travelTime;
-	}
-	
-	public double getDelay() {
-		return delays[songNum];
 	}
 	
 	public double getBeatSpeed() {
@@ -127,7 +132,7 @@ public class Conductor {
 	}
 	
 	public double songPosition() {
-		return songTime - delays[songNum];
+		return songTime;
 	}
 	
 	public double getBPM() {
