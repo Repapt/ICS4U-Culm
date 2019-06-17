@@ -1,9 +1,6 @@
 package tools;
 
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 
@@ -21,7 +18,7 @@ public class Print {
 		text.setX(x);
 		text.setY(y);
 		//text.setFont(Font.font("roberto", FontWeight.BOLD, 30));
-		text.setFont(Images.font);
+		text.setFont(Resources.font);
 		this.dur = dur;
 		
 	}

@@ -1,8 +1,6 @@
 package tools;
 
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Glow;
-import javafx.scene.effect.Shadow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 

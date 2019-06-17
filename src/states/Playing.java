@@ -1,15 +1,11 @@
 package states;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import beats.Beat;
 import beats.Conductor;
 import beats.DrumSound;
 import javafx.scene.Group;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -25,8 +21,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import main.Main;
 import tools.Flash;
-import tools.Images;
-import tools.LoadMidi;
+import tools.Resources;
 import tools.Print;
 
 public class Playing extends GameState{
@@ -106,13 +101,12 @@ public class Playing extends GameState{
 		songName.setX(50);
 		songName.setY(35);
 		songName.setFill(Color.WHITE);
-		songName.setFont(Images.font5);
+		songName.setFont(Resources.font5);
 		
 		artistName = new Text(cond.getArtistName());
 		artistName.setX(50);
 		artistName.setY(15 + songName.getY());
 		artistName.setFill(Color.WHITE);
-		artistName.setFont(Images.superSmall);
 		
 		Print scoreText = new Print(50, 120, -1, Color.WHITE, "Score: " + score);
 		scoreText.center(200);
@@ -201,7 +195,7 @@ public class Playing extends GameState{
 
 		numDraw = startSeq[0];
 
-		pauseText.setFont(Images.font3);
+		pauseText.setFont(Resources.font3);
 		colorText(pauseText);
 		pauseText.setY(pauseText.getY() - 150);
 	
@@ -217,10 +211,10 @@ public class Playing extends GameState{
 		
 		for(int i=0;i<4;i++) {
 			keyString[i] = keys[i];
-			startSeq[i].setFont(Images.font4);
+			startSeq[i].setFont(Resources.font4);
 			colorText(startSeq[i]);
 
-			pauseOptions[i].setFont(Images.font2);
+			pauseOptions[i].setFont(Resources.font2);
 			pauseOptions[i].setX(70);
 			pauseOptions[i].setStroke(Color.web("49a0be"));
 			pauseOptions[i].setFill(Color.web("b5d9e0"));
@@ -326,6 +320,7 @@ public class Playing extends GameState{
 		
 	}
 	
+	@Override
 	public void update(int counter) {
 		
 		complete.setWidth(width * (conductor.songPosition()/conductor.songLength()));
@@ -359,6 +354,7 @@ public class Playing extends GameState{
 			
 			
 			toPrint.get(0).setText("Score: " + score);
+			toPrint.get(0).center(200);
 			toPrint.get(1).setText("X" + mult);
 			toPrint.get(2).setText("" + streak);
 			toPrint.get(3).setText(String.format("%.0f", accuracy*100)+ "%");
@@ -381,6 +377,7 @@ public class Playing extends GameState{
 			if(conductor.update() == 1) {
 				
 				try {
+					Resources.write(conductor.getSongName() + " - " + score + "\n");
 					game.changeState(new Menu(game));
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -393,6 +390,7 @@ public class Playing extends GameState{
 		
 		
 	}
+	@Override
 	public void draw(Group group) {
 		
 		group.getChildren().add(background);
@@ -483,9 +481,11 @@ public class Playing extends GameState{
 		
 	}
 	
+	@Override
 	public void keyRelease(KeyEvent event) {
 	}
 	
+	@Override
 	public void dragged(MouseEvent event) {
 		if(paused && !unpausing) {
 			double x = event.getX();
@@ -542,9 +542,11 @@ public class Playing extends GameState{
 		}
 	}
 	
+	@Override
 	public void mouseRelease(MouseEvent event) {
 		
 	}
+	@Override
 	public void click(MouseEvent event) {
 		double x = event.getX();
 		double y = event.getY();
@@ -591,6 +593,7 @@ public class Playing extends GameState{
 		}
 	}
 	
+	@Override
 	public void keyPress(KeyEvent event) {
 		String key  = event.getText().toUpperCase();
 		if(key.equals(keys[0].getText())) {
@@ -611,6 +614,7 @@ public class Playing extends GameState{
 		}
 	}
 	
+	@Override
 	public void moved(MouseEvent event) {
 		double x = event.getX();
 		double y = event.getY();
@@ -694,20 +698,19 @@ public class Playing extends GameState{
 	}
 	public void genBeats() {
 		
-		if(LoadMidi.beats.size() == 0) {
+		if(Resources.beats.size() == 0) {
+		
 		} else {
-			
-			String next = LoadMidi.beats.get(0);
+			String next = Resources.beats.get(0);
 			int space = next.indexOf(" ");
 			int time = Integer.parseInt(next.substring(0,space));
 					
 			currPos = conductor.songPosition();
-			
 			if(currPos > time*conductor.getTickSize() - conductor.getTravelTime()) {
 				
-				for(int i=0;i<LoadMidi.beats.size();i++) {
+				for(int i=0;i<Resources.beats.size();i++) {
 					
-					String next2 = LoadMidi.beats.get(0);
+					String next2 = Resources.beats.get(0);
 					int space2 = next2.indexOf(" ");
 					int time2 = Integer.parseInt(next2.substring(0,space2));
 					int key2 = Integer.parseInt(next2.substring(space2 + 1));
@@ -734,7 +737,7 @@ public class Playing extends GameState{
 			
 						//conductor.addBeat();
 						
-						LoadMidi.beats.remove(0);
+						Resources.beats.remove(0);
 						
 						
 					} else {

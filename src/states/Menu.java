@@ -1,8 +1,13 @@
 package states;
-
+/*
+ * Author: Samuel Liu
+ * Teacher: Mr. Radulovic
+ * 2019/06/18
+ * Handles events and updates the scene during the menu. Has a page variable that controls
+ * which elements are being changed/selected and displayed (controls, song select, etc)
+ * When a song is selected, it creates a new playing class and the game begins
+ */
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import beats.Conductor;
 import javafx.scene.Group;
 import javafx.scene.effect.DropShadow;
@@ -14,51 +19,41 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextBoundsType;
 import main.Main;
-import tools.Images;
+import tools.Resources;
 import tools.Dash;
-import tools.Print;
 
 public class Menu extends GameState {
 	
+	//Structure variables
 	Main game;
 	Menu menu;
-	
-	Rectangle background;
-	LinearGradient backGrad;
-	
 	Conductor conductor;
 	
+	//Background gradient variables
+	Rectangle background;
+	LinearGradient backGrad;
 	double[] gradStops;
-	
 	double backY = 0;
 	
+	//Management variables
 	int currSet = 0;
-	
+	int page = 0; //page 0 is the title page; 1 is controls, 2 is song select
 	int numSongs;
-
+	
+	//Text variables
 	DropShadow shadow;
-	//Color highlight = Color.web("#86cbd8");
 	Color highlight = Color.web("b5d9e0");
-	
 	String[] keys = new String[4];
-	
 	Text[] keySet = new Text[4];
-	
 	Text[] nav = new Text[3];
-	
 	Text[] songNames, artists;
-	
 	Rectangle[] buttons, keyButtons, songButtons;
 	
+	//Background elements
 	ArrayList<Dash> lines = new ArrayList<Dash>();
-	
 	ImageView title;
-	
-	int page = 0;
 	
 	public Menu(Main g) throws Exception{
 		
@@ -68,22 +63,26 @@ public class Menu extends GameState {
 		
 		conductor = new Conductor(0, height);
 		
+		//Sets gradient values
 		gradStops = new double[4];
 		gradStops[0] = 0;
 		gradStops[1] = 1/3.0;
 		gradStops[2] = 2/3.0;
 		gradStops[3] = 1;
 		
+		//Sets default key bindings
 		keys[0] = "A";
 		keys[1] = "S";
 		keys[2] = "D";
 		keys[3] = "P";
 		
-		title = Images.titleV;
+		//Formats title png
+		title = Resources.titleV;
 		title.setPreserveRatio(true);
 		title.setFitWidth(400);
 		title.setY(50);
 		
+		//Initializing more stuff
 		nav[2] = new Text("back");
 		nav[0] = new Text("Controls");
 		nav[1] = new Text("Song Select");
@@ -98,8 +97,9 @@ public class Menu extends GameState {
 		nav[1].setY(400);
 		nav[2].setY(525);
 		
+		//Formatting text on the title page to look pretty
 		for(int i=0;i<3;i++) {
-			nav[i].setFont(Images.font2);
+			nav[i].setFont(Resources.font2);
 			nav[i].setFill(highlight);
 			//nav[i].setBoundsType(TextBoundsType.VISUAL);
 			nav[i].setX(200 - nav[i].getBoundsInLocal().getWidth()/2);
@@ -107,6 +107,7 @@ public class Menu extends GameState {
 			nav[i].setStrokeWidth(1);
 			nav[i].setEffect(shadow);
 			
+			//Sets box around the text to center around the text
 			buttons[i] = new Rectangle(nav[i].getBoundsInLocal().getWidth()*1.2,nav[i].getBoundsInLocal().getHeight()*1.2,highlight);
 			buttons[i].setX(200 - buttons[i].getWidth()/2);
 			buttons[i].setY(nav[i].getY() -buttons[i].getHeight() + nav[i].getBoundsInLocal().getHeight()/2);
@@ -120,9 +121,11 @@ public class Menu extends GameState {
 		keySet[1] = new Text("Lane 2: " + keys[0]);
 		keySet[2] = new Text("Lane 3: " + keys[0]);
 		keySet[3] = new Text("Pause: " + keys[0]);
+		
+		//Formatting the key binding page to make it look pretty
 		for(int i=0;i<4;i++) {
 
-			keySet[i].setFont(Images.font2);
+			keySet[i].setFont(Resources.font2);
 			keySet[i].setX(200 - keySet[i].getBoundsInLocal().getWidth()/2);
 			keySet[i].setY(70*(i+3) + 40);
 			keySet[i].setFill(highlight);
@@ -139,8 +142,7 @@ public class Menu extends GameState {
 			keyButtons[i].setOpacity(0);
 		}
 		
-		
-		//keySet[3] = new Print(40, 75*6, -1, Color.WHITE, "Pause: " + keys[3]);
+		//Sets background gradient
 		Color thing = Color.web("#370138");
 		backGrad = new LinearGradient(1, 1, 1, 0, true, CycleMethod.NO_CYCLE, 
 				new Stop[] {
@@ -159,10 +161,11 @@ public class Menu extends GameState {
 		artists = new Text[numSongs];
 		songButtons = new Rectangle[numSongs];
 		
+		//Making the song list look pretty
 		for(int i=0;i<numSongs; i++) {
 			String song = conductor.getSongList()[i];
 			songNames[i] = new Text(song);
-			songNames[i].setFont(Images.font5);
+			songNames[i].setFont(Resources.font5);
 			songNames[i].setX(40);
 			songNames[i].setY(70*(i+3) + 40);
 			songNames[i].setFill(highlight);
@@ -171,7 +174,6 @@ public class Menu extends GameState {
 			songNames[i].setEffect(shadow);
 			
 			artists[i] = new Text(conductor.getArtistList()[i]);
-			artists[i].setFont(Images.superSmall);
 			artists[i].setX(40);
 			artists[i].setY(70*(i+3) + songNames[i].getBoundsInLocal().getHeight() + 7);
 			artists[i].setFill(highlight);
@@ -189,6 +191,7 @@ public class Menu extends GameState {
 			songButtons[i].setEffect(shadow);
 			songButtons[i].setOpacity(0);
 		}
+		
 	
 				
 	
@@ -197,22 +200,26 @@ public class Menu extends GameState {
 	@Override
 	public void update(int counter) {
 		
+		//Moves the background gradient
+		//The background gradient is a big rectangle and it moves up and down the screen
 		backY += 0.01;
 		background.setY(600*Math.sin(backY) - 600);
 		
+		//Randomly adds blue dashes across the screen
 		if(Math.random() < 0.3) {
 			lines.add(new Dash());
 		}
 		
+		//Moves the blue dashes and removes them when they leave the screen
 		for(int i=0;i<lines.size();i++) {
 			Dash curr = lines.get(i);
 			curr.update();
-			if(curr.getX() > 400 || curr.getY() > 600 || curr.getY() + curr.getHeight() < 0 || curr.getX() + curr.getWidth() < 0) {
+			if(curr.getX() > width || curr.getY() > height || curr.getY() + curr.getHeight() < 0 || curr.getX() + curr.getWidth() < 0) {
 				lines.remove(i);
 			}
 		}
 		
-		//System.out.println(Arrays.toString(gradStops));
+		//Updates the text
 		if(page == 1) {
 			for(int i=0;i<3;i++) {
 				keySet[i].setText("Lane " + (i+1) + ": " + keys[i]);
@@ -226,21 +233,27 @@ public class Menu extends GameState {
 
 	@Override
 	public void keyPress(KeyEvent event) {
+		//sets key bindings
 		if(page == 1) {
 			keys[currSet] = event.getText().toUpperCase();
 		}
 	}
 	
+	@Override
 	public void dragged(MouseEvent event) {
 		
 	}
+	@Override
 	public void mouseRelease(MouseEvent event) {
 		
 	}
 	
+	@Override
 	public void click(MouseEvent event){
 		double y = event.getY();
 		if(page == 1) {
+			//changes which key binding is being changed based on whether the click occurred
+			//in the box of the respective button
 			if(y > keyButtons[0].getY() && y < keyButtons[0].getY() + keyButtons[0].getHeight()) {
 				currSet = 0;
 			} else if (y > keyButtons[1].getY() && y < keyButtons[1].getY() + keyButtons[1].getHeight()) {
@@ -250,29 +263,33 @@ public class Menu extends GameState {
 			} else if (y > keyButtons[3].getY() && y < keyButtons[3].getY() + keyButtons[3].getHeight()) {
 				currSet = 3;
 			} else if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
+				//back button
 				page = 0;
 				mouseReset();
 			}
 		} else if (page == 0) {
-			if(page == 0) {
-				if(y > buttons[0].getY() && y < buttons[0].getY() + buttons[0].getHeight()) {
-					page = 1;
-					mouseReset();
-				} else if(y > buttons[1].getY() && y < buttons[1].getY() + buttons[1].getHeight()) {
-					page = 2;
-					mouseReset();
-				}
+			//changes page based on where the click occurred
+			if(y > buttons[0].getY() && y < buttons[0].getY() + buttons[0].getHeight()) {
+				page = 1;
+				mouseReset();
+			} else if(y > buttons[1].getY() && y < buttons[1].getY() + buttons[1].getHeight()) {
+				page = 2;
+				mouseReset();
 			}
+			
 			
 		} else if(page ==2) {
 			
 			if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
+				//back button
 				page = 0;
 				mouseReset();
 			} else {
+				//checks which song was selected based on the location of the click
 				for(int i=0;i<numSongs;i++) {
 					if(y > songButtons[i].getY() && y < songButtons[i].getY() + songButtons[i].getHeight()) {
-
+						
+						//sets song and changes gamestate to playing
 						conductor.setSong(i);
 						game.refreshCounter();
 						game.changeState(new Playing(game, keys, conductor));
@@ -286,10 +303,14 @@ public class Menu extends GameState {
 		}
 	}
 	
+	//if you move your mouse over a block, it lights up
+	//tracks mouse movement and lights up blocks when you enter them
+	@Override
 	public void moved(MouseEvent event) {
 		double y = event.getY();
 		double x = event.getX();
 		mouseReset();
+		//each button has a respective number
 		if(page == 0) {
 			if(y > buttons[0].getY() && y < buttons[0].getY() + buttons[0].getHeight()) {
 				mousedOver(page, 0);
@@ -327,15 +348,11 @@ public class Menu extends GameState {
 		}
 	}
 
+	//draws everything to the group
 	@Override
 	public void draw(Group group) {
 		
 		group.getChildren().add(background);
-		
-		
-		Rectangle temp = new Rectangle(400, 6, Color.WHITE);
-		temp.setY(100);
-		//group.getChildren().add(temp);
 		
 		for(int i=0;i<lines.size();i++) {
 			group.getChildren().add(lines.get(i).getRect());
@@ -343,6 +360,7 @@ public class Menu extends GameState {
 		
 		group.getChildren().add(buttons[2]);
 		
+		//adds only the elements associated with the page
 		if(page == 0) {
 
 			group.getChildren().add(buttons[0]);
@@ -357,7 +375,9 @@ public class Menu extends GameState {
 				group.getChildren().add(keySet[i]);
 			}
 			group.getChildren().add(nav[2]);
+			
 		} else if (page == 2) {
+			
 			for(int i=0;i<numSongs; i++) {
 				group.getChildren().add(songButtons[i]);
 				group.getChildren().add(songNames[i]);
@@ -370,11 +390,12 @@ public class Menu extends GameState {
 		group.getChildren().add(title);
 	}
 
+	
 	@Override
 	public void keyRelease(KeyEvent event) {
-		
 	}
 	
+	//colours the text and buttons whenever it is moused over
 	public void mousedOver(int page, int num) {
 		if(page == 0) {
 			nav[num].setFill(Color.web("013b53"));
@@ -388,6 +409,7 @@ public class Menu extends GameState {
 				nav[num].setStrokeWidth(0);
 				buttons[num].setOpacity(1);
 			} else {
+				//convert the number of the button to the index in the array
 				keySet[num - 3].setFill(Color.web("013b53"));
 				keySet[num - 3].setEffect(null);
 				keySet[num - 3].setStrokeWidth(0);
@@ -402,6 +424,7 @@ public class Menu extends GameState {
 				nav[num].setStrokeWidth(0);
 				buttons[num].setOpacity(1);
 			}else {
+				//convert the number of the button to the index in the array
 				songNames[num - 7].setFill(Color.web("013b53"));
 				songNames[num - 7].setEffect(null);
 				songNames[num - 7].setStrokeWidth(0);
@@ -416,6 +439,9 @@ public class Menu extends GameState {
 		}
 	}
 	
+	//resets everything to as if it wasn't moused over
+	//ensures that nothing persists on the screen from the previous page
+	//when the page is changed
 	public void mouseReset() {
 		for(int i=0;i<3;i++) {
 

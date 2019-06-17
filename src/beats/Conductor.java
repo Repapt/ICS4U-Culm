@@ -1,25 +1,28 @@
 package beats;
-
+/*
+ * Author: Samuel Liu
+ * Teacher: Mr. Radulovic
+ * 2019/06/18
+ * Tempo keeper for game. Controls the audio being played and keeps track of the game time.
+ * Keeps all track information including names, artists, bpm, ticksize
+ */
 import java.io.IOException;
-
 import javax.sound.midi.InvalidMidiDataException;
-
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import tools.LoadMidi;
+import tools.Resources;
 
 public class Conductor {
 	
-	int numSongs = 5;
+	int numSongs = 4;
 	
 	double[] bpm = new double[numSongs];
 	double[] beatVol = new double[numSongs];
 	double prevFrame, songTime = 0, lastPos = 0;
 	double increment;
 	
+	//Variables controlling how quickly 'beats' travel across the screen;
+	//Useful for syncing up when 'beats' are generated vs when they require a key press
 	double beatSpeed, beatTime, travelTime;
-		
-	Media[] songs = new Media[numSongs];
 	
 	String[] songNames = new String[numSongs];
 	String[] artists = new String[numSongs];
@@ -37,7 +40,8 @@ public class Conductor {
 		this.songNum = songNum;
 		this.height = height;
 		
-		
+		//These are manually typed in
+		//In the (distant) future, these will be automatically generated
 		bpm[0] = 152;
 		bpm[1] = 100;
 		bpm[2] = 170;
@@ -58,37 +62,23 @@ public class Conductor {
 		artists[2] = "FIDLAR";
 		artists[3] = "Post Malone & Swae Lee";
 		
-		for(int i=0;i<4;i++) {
-			songs[i] = new Media(getClass().getResource(songNames[i] + ".wav").toExternalForm());
-		}
+		Resources.loadAudio(numSongs, songNames);
 		
-		player = new MediaPlayer(songs[songNum]);
-		increment = 60/bpm[songNum];
+		player = new MediaPlayer(Resources.songs[songNum]);
 		
-		//t = bpm/60
-		//travel 550 in t
-		//speed = 550/(t)
-		//updates 60 times per sec, so
-		//speed = speed/60
-		
+		//calculates based on distance they travel and how quickly they aught to move
 		beatSpeed = (height-100.0)*(bpm[songNum]/7200);
 		travelTime = (height-50.0)/(60*beatSpeed);
-		//System.out.println(travelTime);
-		//beatTime = travelTime;
 		
 		
 	}
-	/*
-	public void addBeat() {
-		beatTime += increment;
-	}
-	*/
 	
 	
 	
 	public void play() throws InvalidMidiDataException, IOException {
-		LoadMidi.load(songNum);
-		tickSize = LoadMidi.resolution * (bpm[songNum]/60);
+		Resources.loadSong(songNum);
+		//the duration of one 'tick' in the midi track, in seconds
+		tickSize = Resources.resolution * (bpm[songNum]/60);
 		tickSize = 1.0/tickSize;
 		prevFrame = System.nanoTime()/1000000000.0;
 		player.play();
@@ -96,7 +86,8 @@ public class Conductor {
 	
 	public void setSong(int num){
 		songNum = num;
-		player = new MediaPlayer(songs[songNum]);
+		player = new MediaPlayer(Resources.songs[songNum]);
+		
 	}
 	
 	public double getTickSize() {
