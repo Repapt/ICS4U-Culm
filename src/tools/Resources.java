@@ -113,6 +113,7 @@ public class Resources {
 		}
 	}
 	
+	//write method to add score to highscore text file
 	public static void write(String score) {
 		try {
 			System.out.println(score);

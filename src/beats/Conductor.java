@@ -4,7 +4,7 @@ package beats;
  * Teacher: Mr. Radulovic
  * 2019/06/18
  * Tempo keeper for game. Controls the audio being played and keeps track of the game time.
- * Keeps all track information including names, artists, bpm, ticksize
+ * Keeps all track information including names, artists, bpm, ticksize.
  */
 import java.io.IOException;
 import javax.sound.midi.InvalidMidiDataException;
@@ -18,7 +18,6 @@ public class Conductor {
 	double[] bpm = new double[numSongs];
 	double[] beatVol = new double[numSongs];
 	double prevFrame, songTime = 0, lastPos = 0;
-	double increment;
 	
 	//Variables controlling how quickly 'beats' travel across the screen;
 	//Useful for syncing up when 'beats' are generated vs when they require a key press
@@ -85,19 +84,18 @@ public class Conductor {
 	}
 	
 	public void setSong(int num){
-		songNum = num;
+		songNum = num; //updates songNum so that everything else (artist, bpm, etc) stay in sync
 		player = new MediaPlayer(Resources.songs[songNum]);
 		
 	}
 	
+	//Getter methods
 	public double getTickSize() {
 		return tickSize;
 	}
-	
 	public String[] getSongList() {
 		return songNames;
 	}
-	
 	public String getSongName() {
 		return songNames[songNum];
 	}
@@ -113,42 +111,38 @@ public class Conductor {
 	public double getTravelTime() {
 		return travelTime;
 	}
-	
 	public double getBeatSpeed() {
 		return beatSpeed;
 	}
-	
 	public double getBeatTime() {
 		return beatTime;
 	}
-	
 	public double songPosition() {
 		return songTime;
 	}
-	
 	public double getBPM() {
 		return bpm[songNum];
 	}
-	
-	public double getIncr() {
-		return increment;
-	}
-	
 	public double getSongVol() {
 		return player.getVolume();
 	}
-	
-	
 	public double songLength() {
 		return player.getTotalDuration().toSeconds();
 	}
 	
-	
+	//increasing songTime by 1/60th of a second every iteration doesn't work because
+	//of small inconsistencies or background processes that slowly cause the songTime to be
+	//out of sync with the actual song.
+	//basing songTime on player's current time also doesn't work because the song occasionally
+	//has small hiccups that cause it to go out of sync
+	//Whenever I update, I get the average between adding 1/60th of a second and getting the
+	//player's time to minimize inconsistencies
 	public int update() {
 		songTime += System.nanoTime()/1000000000.0 - prevFrame;
 		prevFrame = System.nanoTime()/1000000000.0;
 		
 		if(Math.abs(songPosition() - songLength()) < 0.05) {
+			//returns 1 if the song is over
 			return 1;
 			
 		} else if (player.getCurrentTime().toSeconds() != lastPos) {
@@ -157,12 +151,13 @@ public class Conductor {
 			lastPos = player.getCurrentTime().toSeconds();
 			
 		}
-		
+		//normally returns 0
 		return 0;
 		
 		
 	}
 	
+	//pause and unpause
 	public void pause() {
 		player.pause();
 	}
@@ -170,6 +165,8 @@ public class Conductor {
 		prevFrame = System.nanoTime()/1000000000.0;
 		player.play();
 	}
+	
+	//set respective volumes
 	public void setBeatVol(double vol) {
 		beatVol[songNum] = vol;
 	}

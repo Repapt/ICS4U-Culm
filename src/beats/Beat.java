@@ -1,5 +1,11 @@
 package beats;
-
+/*
+ * Author: Samuel Liu
+ * Teacher: Mr. Radulovic
+ * 2019/06/18
+ * Beat class to generate the falling 'beats'. Has a speed specified by conductor, and a 
+ * specific lane it falls in.
+ */
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -26,6 +32,8 @@ public class Beat {
 	
 	public Circle circle = new Circle(x, y, 25, gradient);	
 	
+	//image could not be in the Resources class, since that is static and javafx does not
+	//allow duplicate elements to be added to the scene at the same time
 	public Image image = new Image(this.getClass().getResourceAsStream("beat.png"));
 	public ImageView iView = new ImageView(image);
 	
@@ -43,15 +51,11 @@ public class Beat {
 		iView.setX(x-25);
 		iView.setY(y-25);
 		
-		/*
-		circle.setStrokeType(StrokeType.OUTSIDE);
-		circle.setStroke(Color.web("black", 0.5));
-		circle.setStrokeWidth(3);
-		*/
 				
 	}
 	
 	public void move(boolean moving) {
+		//the beat momentarily pauses for 5 frames when it enters the 'perfect' range
 		if(!moving) {
 			pauseCount ++;
 			iView.setY(y-25);

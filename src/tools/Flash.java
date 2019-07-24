@@ -1,5 +1,11 @@
 package tools;
-
+/*
+ * Author: Samuel Liu
+ * Teacher: Mr. Radulovic
+ * 2019/06/18
+ * Class for the 'flashes' that are generated every time a keypress is made. Creates a temporary
+ * flash in the lane that the keypress was in.
+ */
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -26,7 +32,8 @@ public class Flash {
 			            new Stop(0.2, Color.web("#d8c550", 0.75)),
 			            new Stop(1, Color.web("000000", 0)),
 			});
-		
+		//flash is slightly golden if the streak is 32+
+		//flash is white otherwise
 		if(streak > 31) {
 			flash = new Rectangle(100, 300, grad2);
 		} else {
@@ -42,6 +49,7 @@ public class Flash {
 	}
 
 	public int update() {
+		//flash only lasts for 5 frames
 		dur ++;
 		if(dur > 5) {
 			return -1;

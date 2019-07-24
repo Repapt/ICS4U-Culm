@@ -1,5 +1,12 @@
 package states;
-
+/*
+ * Author: Samuel Liu
+ * Teacher: Mr. Radulovic
+ * 2019/06/18
+ * Parent class for various gamestates. Makes switching between the two gamestates in my
+ *main class easier.
+ *has all the event handling classes as well as the height and width of the game window
+ */
 import javafx.scene.Group;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
