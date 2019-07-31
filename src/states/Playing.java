@@ -412,6 +412,8 @@ public class Playing extends GameState{
 			for(int i=0;i<drums.size();i++) {
 				if(drums.get(0).isEnded()) {
 					drums.remove(0);
+				} else {
+					break;
 				}
 			}
 			
@@ -622,6 +624,7 @@ public class Playing extends GameState{
 				if(y > quitButton.getY() && y < quitButton.getY() + quitButton.getHeight()) {
 					if(x > quitButton.getX() && x < quitButton.getX() + quitButton.getWidth()) {
 						try {
+							drums.add(new DrumSound(conductor.getBeatVol(), 2));
 							game.changeState(new Menu(game));
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -629,6 +632,7 @@ public class Playing extends GameState{
 						}
 					} else if(x > resumeButton.getX() && x < resumeButton.getX() + resumeButton.getWidth()) {
 						if(paused && !unpausing) {
+							drums.add(new DrumSound(conductor.getBeatVol(), 2));
 							unpausing = true;
 							unpauseCounter = 0;
 						} else {

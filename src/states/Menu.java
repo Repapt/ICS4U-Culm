@@ -9,6 +9,7 @@ package states;
  */
 import java.util.ArrayList;
 import beats.Conductor;
+import beats.DrumSound;
 import javafx.scene.Group;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
@@ -54,6 +55,8 @@ public class Menu extends GameState {
 	//Background elements
 	ArrayList<Dash> lines = new ArrayList<Dash>();
 	ImageView title;
+	
+	ArrayList<DrumSound> drums = new ArrayList<DrumSound>();
 	
 	public Menu(Main g) throws Exception{
 		
@@ -210,6 +213,15 @@ public class Menu extends GameState {
 			lines.add(new Dash());
 		}
 		
+		//removes sounds when they're finished playing to reduce lag
+		for(int i=0;i<drums.size();i++) {
+			if(drums.get(0).isEnded()) {
+				drums.remove(0);
+			} else {
+				break;
+			}
+		}
+		
 		//Moves the blue dashes and removes them when they leave the screen
 		for(int i=0;i<lines.size();i++) {
 			Dash curr = lines.get(i);
@@ -256,24 +268,31 @@ public class Menu extends GameState {
 			//in the box of the respective button
 			if(y > keyButtons[0].getY() && y < keyButtons[0].getY() + keyButtons[0].getHeight()) {
 				currSet = 0;
+				drums.add(new DrumSound(0.7, 1));
 			} else if (y > keyButtons[1].getY() && y < keyButtons[1].getY() + keyButtons[1].getHeight()) {
 				currSet = 1;
+				drums.add(new DrumSound(0.7, 1));
 			} else if (y > keyButtons[2].getY() && y < keyButtons[2].getY() + keyButtons[2].getHeight()) {
 				currSet = 2;
+				drums.add(new DrumSound(0.7, 1));
 			} else if (y > keyButtons[3].getY() && y < keyButtons[3].getY() + keyButtons[3].getHeight()) {
 				currSet = 3;
+				drums.add(new DrumSound(0.7, 1));
 			} else if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
 				//back button
 				page = 0;
+				drums.add(new DrumSound(0.7, 2));
 				mouseReset();
 			}
 		} else if (page == 0) {
 			//changes page based on where the click occurred
 			if(y > buttons[0].getY() && y < buttons[0].getY() + buttons[0].getHeight()) {
 				page = 1;
+				drums.add(new DrumSound(0.7, 1));
 				mouseReset();
 			} else if(y > buttons[1].getY() && y < buttons[1].getY() + buttons[1].getHeight()) {
 				page = 2;
+				drums.add(new DrumSound(0.7, 1));
 				mouseReset();
 			}
 			
@@ -283,12 +302,14 @@ public class Menu extends GameState {
 			if(y > buttons[2].getY() && y < buttons[2].getY() + buttons[2].getHeight()) {
 				//back button
 				page = 0;
+				drums.add(new DrumSound(0.7, 2));
 				mouseReset();
 			} else {
 				//checks which song was selected based on the location of the click
 				for(int i=0;i<numSongs;i++) {
 					if(y > songButtons[i].getY() && y < songButtons[i].getY() + songButtons[i].getHeight()) {
 						
+						drums.add(new DrumSound(0.7, 2));
 						//sets song and changes gamestate to playing
 						conductor.setSong(i);
 						game.refreshCounter();
